@@ -12,5 +12,5 @@ poetry install
 
 ### Run
 ```sh
-uvicorn src.main:app --reload
+uvicorn app.main:app --reload
 ```
