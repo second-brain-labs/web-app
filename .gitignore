@@ -5,4 +5,4 @@
 .env.local
 .vscode
 .idea
-
+.DS_Store
