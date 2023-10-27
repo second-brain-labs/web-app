@@ -2,7 +2,7 @@
 # Run from backend directory with: python3 app/populate_db.py
 
 import os
-from app.models import User, Article, Base
+from app.models import UserModel, ArticleModel, Base
 from app.db import get_db, engine
 
 if os.path.exists("sql_app.db"):
@@ -14,7 +14,7 @@ Base.metadata.create_all(bind=engine)
 
 # create users
 def create_user(db, name, email, password):
-    user = User(name=name, email=email, password=password)
+    user = UserModel(name=name, email=email, password=password)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -22,7 +22,7 @@ def create_user(db, name, email, password):
 
 # create articles
 def create_article(db, title, content, summary, url, user_id):
-    article = Article(title=title, content=content, summary=summary, url=url, user_id=user_id)
+    article = ArticleModel(title=title, content=content, summary=summary, url=url, user_id=user_id)
     db.add(article)
     db.commit()
     db.refresh(article)

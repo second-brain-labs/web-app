@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 class ArticleBase(BaseModel):
@@ -13,10 +14,11 @@ class Article(ArticleBase):
     summary: str
     time_created: str
     user_id: int
-    
+    time_created: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 class UserBase(BaseModel):
     email: str
@@ -27,7 +29,12 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+
+    class Config:
+        from_attributes = True
+
+class UserWithArticles(User):
     articles: list = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
