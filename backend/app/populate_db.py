@@ -3,19 +3,13 @@
 
 import os
 from app.models import User, Article, Base
-from app.db import SessionLocal, engine
+from app.db import get_db, engine
 
 if os.path.exists("sql_app.db"):
     os.remove("sql_app.db")
 
 Base.metadata.create_all(bind=engine)
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
     
 
 # create users
