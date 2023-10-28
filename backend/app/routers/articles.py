@@ -16,3 +16,8 @@ async def get_articles(user_id: int, db=Depends(get_db)):
     print(db.query(ArticleModel).all())
     articles : list[ArticleModel] = db.query(ArticleModel).filter(ArticleModel.user_id == user_id).all()
     return articles
+
+@router.get("/{article_id}", response_model=ArticleSchema)
+async def get_article(article_id: int, db=Depends(get_db)):
+    article : ArticleModel = db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+    return article
