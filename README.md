@@ -9,3 +9,6 @@ Note that pre-commit hooks are run automatically on commit, but you can also run
 
 ## Backend-specific
 See [backend/README.md](backend/README.md)
+
+# Development
+Install `Docker` and `docker-compose`. Then, run `docker-compose up` to start the backend and frontend. THe frontend is not functional.
