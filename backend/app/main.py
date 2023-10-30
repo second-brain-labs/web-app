@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 from app import models
 from app.db import engine
 from app.routers import users, articles
-from app.populate_db import main as populate_db
+
 
 models.Base.metadata.create_all(bind=engine)
 
 load_dotenv()
-populate_db()
+
 api = FastAPI()
 
 api.include_router(users.router)
