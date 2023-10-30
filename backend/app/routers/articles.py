@@ -6,7 +6,7 @@ from app.models import ArticleModel, DirectoryModel
 from app.schemas import ArticleSchema, ArticleCreateSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema
 import PyPDF2
 import random
-
+from transformers import AutoTokenizer, AutoModelWithLMHead
 router = APIRouter(prefix="/articles")
 
 @router.get("/")
@@ -89,7 +89,18 @@ async def create_article(article: ArticleCreateSchema = Depends(), db=Depends(ge
     article = ArticleModel(title=article.title, url=article.url, user_id=article.user_id, directory=article.directory, content=article_content)
     os.remove(file_location)
     # mock summary
-    article.summary = "This is a summary"
+    tokenizer = AutoTokenizer.from_pretrained('t5-base')
+    model = AutoModelWithLMHead.from_pretrained('t5-base', return_dict=True)
+    inputs = tokenizer.encode("summarize: " + article_content,
+        return_tensors='pt',
+        max_length=512,
+        truncation=True
+    )
+    summary_ids = model.generate(inputs, max_length=200, min_length=80, length_penalty=5., num_beams=2)
+
+    article.summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+
     db.add(article)
     db.commit()
     db.refresh(article)
