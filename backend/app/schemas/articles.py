@@ -5,13 +5,14 @@ from pydantic import BaseModel
 
 class ArticleBaseSchema(BaseModel):
     title: str = Form(...)
-    url: str = Form(...)
     user_id: int = Form(...)
     directory: str = Form(...)
 
-class ArticleCreateSchema(ArticleBaseSchema):
+class ArticleCreatePDFSchema(ArticleBaseSchema):
     uploaded_file: UploadFile = Form(...)
 
+class ArticleCreateHTMLSchema(ArticleBaseSchema):
+    url: str = Form(...)
 
 class ArticleSchema(ArticleBaseSchema):
     summary: str

@@ -1,9 +1,9 @@
 import os
 import shutil
 from app.db import get_db
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from app.models import ArticleModel, DirectoryModel
-from app.schemas.articles import ArticleSchema, ArticleCreateSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema
+from app.schemas.articles import ArticleSchema, ArticleCreatePDFSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema, ArticleCreateHTMLSchema
 import PyPDF2
 import random
 from transformers import AutoTokenizer, AutoModelWithLMHead
@@ -66,8 +66,38 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
     db.refresh(directory)
     return directory
 
+
+
+def handle_article(db, title, user_id, directory, content, url=None):
+    tokenizer = AutoTokenizer.from_pretrained('t5-base')
+    model = AutoModelWithLMHead.from_pretrained('t5-base', return_dict=True)
+    inputs = tokenizer.encode("summarize: " + content,
+        return_tensors='pt',
+        max_length=512,
+        truncation=True
+    )
+    summary_ids = model.generate(inputs, max_length=200, length_penalty=5., num_beams=2)
+
+    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+    article = ArticleModel(title=title, user_id=user_id, directory=directory, summary=summary, content=content, url=url)
+    db.add(article)
+    db.commit()
+    db.refresh(article)
+
+    return article
+
+@router.post("/article/create", response_model=ArticleContentSchema)
+async def create_article(article: ArticleCreateHTMLSchema = Depends(), content : str = Body(..., embed=True), db=Depends(get_db)):
+    directory = db.query(DirectoryModel).filter(DirectoryModel.name == article.directory, DirectoryModel.user_id == article.user_id).first()
+    if directory is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Directory not found")
+
+    article = handle_article(db, article.title, article.user_id, article.directory, content, article.url)
+    return article
+
 @router.post("/article/upload", response_model=ArticleContentSchema)
-async def create_article(article: ArticleCreateSchema = Depends(), db=Depends(get_db)):
+async def upload_article(article: ArticleCreatePDFSchema = Depends(), db=Depends(get_db)):
     # check if directory exists
 
     # assumes text and not file
@@ -86,22 +116,8 @@ async def create_article(article: ArticleCreateSchema = Depends(), db=Depends(ge
         page = pdf_reader.pages[i]
         text += page.extract_text().replace("\n", " ")
     article_content = text
-    article = ArticleModel(title=article.title, url=article.url, user_id=article.user_id, directory=article.directory, content=article_content)
     os.remove(file_location)
     # mock summary
-    tokenizer = AutoTokenizer.from_pretrained('t5-base')
-    model = AutoModelWithLMHead.from_pretrained('t5-base', return_dict=True)
-    inputs = tokenizer.encode("summarize: " + article_content,
-        return_tensors='pt',
-        max_length=512,
-        truncation=True
-    )
-    summary_ids = model.generate(inputs, max_length=200, min_length=80, length_penalty=5., num_beams=2)
+    article = handle_article(db, article.title, article.user_id, article.directory, article_content)
 
-    article.summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-
-
-    db.add(article)
-    db.commit()
-    db.refresh(article)
     return article
