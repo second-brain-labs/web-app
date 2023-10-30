@@ -1,24 +1,25 @@
 from datetime import datetime
 from pydantic import BaseModel
 
-class ArticleBase(BaseModel):
+
+class Article(BaseModel):
     title: str
     url: str
 
-class ArticleCreate(ArticleBase):
-    pass
-
-class Article(ArticleBase):
     id: int
-    content: str
     summary: str
     time_created: str
     user_id: int
     time_created: datetime
-    
+    directory: str
     class Config:
         from_attributes = True
 
+class ArticleWithContent(Article):
+    content: str
+
+    class Config:
+        from_attributes = True
 
 class UserBase(BaseModel):
     email: str

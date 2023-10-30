@@ -21,8 +21,8 @@ def create_user(db, name, email, password):
     return user
 
 # create articles
-def create_article(db, title, content, summary, url, user_id):
-    article = ArticleModel(title=title, content=content, summary=summary, url=url, user_id=user_id)
+def create_article(db, title, content, summary, url, user_id, directory=""):
+    article = ArticleModel(title=title, content=content, summary=summary, url=url, user_id=user_id, directory=directory)
     db.add(article)
     db.commit()
     db.refresh(article)
@@ -31,6 +31,6 @@ def create_article(db, title, content, summary, url, user_id):
 db = next(get_db())
 user1 = create_user(db=db, name="John Doe", email="johndoe@gmail.com", password="password")
 user2 = create_user(db=db, name="Jane Doe", email="janedoe@gmail.com", password="password")
-create_article(db=db, title="Article 1", content="This is the content for article 1", summary="This is the summary for article 1", url="https://www.google.com", user_id=user1.id)
-create_article(db=db, title="Article 2", content="This is the content for article 2", summary="This is the summary for article 2", url="https://www.google.com", user_id=user1.id)
+create_article(db=db, title="Article 1", content="This is the content for article 1", summary="This is the summary for article 1", url="https://www.google.com", user_id=user1.id, directory="directory1")
+create_article(db=db, title="Article 2", content="This is the content for article 2", summary="This is the summary for article 2", url="https://www.google.com", user_id=user1.id, directory="directory1/subdirectory1")
 create_article(db=db, title="Article 3", content="This is the content for article 3", summary="This is the summary for article 3", url="https://www.google.com", user_id=user2.id)
