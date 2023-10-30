@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class ArticleBaseSchema(BaseModel):
     title: str = Form(...)
-
+    url: str = Form(...)
     user_id: int = Form(...)
     directory: str = Form(...)
 
