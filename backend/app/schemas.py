@@ -1,14 +1,16 @@
 from datetime import datetime
+from fastapi import Form, UploadFile
 from pydantic import BaseModel
 
 class ArticleBaseSchema(BaseModel):
-    title: str
-    url: str
-    user_id: int
-    directory: str
+    title: str = Form(...)
+    url: str = Form(...)
+    user_id: int = Form(...)
+    directory: str = Form(...)
+
 
 class ArticleCreateSchema(ArticleBaseSchema):
-    content : str
+    uploaded_file: UploadFile = Form(...)
 
 class ArticleSchema(ArticleBaseSchema):
     summary: str
@@ -52,4 +54,4 @@ class DirectoryInfoSchema(DirectoryCreateSchema):
     parent_directory: str
 
     class Config:
-        from_attributes = True 
+        from_attributes = True

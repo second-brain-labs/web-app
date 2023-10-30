@@ -1,7 +1,11 @@
+import os
+import shutil
 from app.db import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models import ArticleModel, DirectoryModel
 from app.schemas import ArticleSchema, ArticleCreateSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema
+import PyPDF2
+import random
 
 router = APIRouter(prefix="/articles")
 
@@ -62,15 +66,28 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
     db.refresh(directory)
     return directory
 
-@router.post("/article/upload", response_model=ArticleSchema)
-async def create_article(article: ArticleCreateSchema, db=Depends(get_db)):
+@router.post("/article/upload", response_model=ArticleContentSchema)
+async def create_article(article: ArticleCreateSchema = Depends(), db=Depends(get_db)):
     # check if directory exists
 
     # assumes text and not file
     directory = db.query(DirectoryModel).filter(DirectoryModel.name == article.directory, DirectoryModel.user_id == article.user_id).first()
     if directory is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Directory not found")
-    article = ArticleModel(title=article.title, url=article.url, user_id=article.user_id, directory=article.directory, content=article.content)
+    file_location = f"./{article.uploaded_file.filename}{random.randint(0, 1000000)}"
+    with open(file_location, "wb+") as file_object:
+        shutil.copyfileobj(article.uploaded_file.file, file_object)
+
+
+    pdf_reader = PyPDF2.PdfReader(file_location)
+    total_pages = len(pdf_reader.pages)
+    text = ""
+    for i in range(total_pages):
+        page = pdf_reader.pages[i]
+        text += page.extract_text().replace("\n", " ")
+    article_content = text
+    article = ArticleModel(title=article.title, url=article.url, user_id=article.user_id, directory=article.directory, content=article_content)
+    os.remove(file_location)
     # mock summary
     article.summary = "This is a summary"
     db.add(article)
