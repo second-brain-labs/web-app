@@ -1,9 +1,9 @@
-from fastapi import Depends, FastAPI, Request
+from fastapi import FastAPI
 import uvicorn
 import os
 from dotenv import load_dotenv
 from app import models
-from app.db import get_db, engine
+from app.db import engine
 from app.routers import users, articles
 
 
@@ -15,7 +15,7 @@ api = FastAPI()
 
 api.include_router(users.router)
 api.include_router(articles.router)
-        
+
 
 
 @api.get("/")

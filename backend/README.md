@@ -10,7 +10,12 @@ poetry shell
 poetry install
 ```
 
-### Run
+## Run
 ```sh
-uvicorn app.main:app --reload
+uvicorn app.main:api --reload
+```
+### Populate database
+While the server is running, run:
+```sh
+python3 populate_db.py [server_url]
 ```

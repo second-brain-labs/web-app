@@ -4,7 +4,7 @@ import ArticleImg from "../../assets/images/article.png";
 
 interface ArticleProps {
     title: string;
-    onClick: () => void;
+    onClick?: () => void;
 }
 
 const ArticleCard: React.FC<ArticleProps> = ({ title, onClick }) => {

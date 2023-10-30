@@ -1,19 +1,17 @@
 import React from 'react';
-import '../article.css';
+import "../../styles/article.css";
 
 interface ArticleViewProps {
-    title: string;
-    content: string;
-    imageUrl?: string;
+    article_id: number
 }
 
-const ArticleView: React.FC<ArticleViewProps> = ({ title, content, imageUrl }) => {
+const ArticleView: React.FC<ArticleViewProps> = ({ article_id }) => {
     return (
         <div className="article-view">
-            <h1 className="view-title">{title}</h1>
-            {imageUrl && <img src={imageUrl} alt={title} className="view-image" />}
+            <h1 className="view-title">{"title"}</h1>
+            
             <div className="view-content">
-                {content}
+                {article_id}
             </div>
         </div>
     );
