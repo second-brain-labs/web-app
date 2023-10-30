@@ -11,7 +11,6 @@ async def article_info():
 
 @router.get("/user/{user_id}", response_model=list[ArticleSchema])
 async def get_articles(user_id: int, db=Depends(get_db)):
-    print(db.query(ArticleModel).all())
     articles : list[ArticleModel] = db.query(ArticleModel).filter(ArticleModel.user_id == user_id).all()
     return articles
 
@@ -28,7 +27,6 @@ async def get_article_content(article_id: int, db=Depends(get_db)):
 @router.get("/directory/articles", response_model=list[ArticleSchema])
 async def get_articles_by_directory(name: str, user_id: str, db=Depends(get_db)):
     articles : list[ArticleModel] = db.query(ArticleModel).filter(ArticleModel.directory == name, ArticleModel.user_id == user_id).all()
-    print(articles)
     return articles
 
 @router.get("/directory/subdirectories", response_model=list[DirectoryInfoSchema])
