@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 from app.db import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models import *
-from app.schemas import User as UserSchema
+from app.schemas import UserSchema
 
 router = APIRouter(prefix="/users")
 
