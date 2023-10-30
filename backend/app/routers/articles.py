@@ -1,7 +1,6 @@
-import sys
 from app.db import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.models import *
+from app.models import ArticleModel, DirectoryModel
 from app.schemas import ArticleSchema, ArticleCreateSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema
 
 router = APIRouter(prefix="/articles")
@@ -66,4 +65,3 @@ async def create_article(article: ArticleCreateSchema, db=Depends(get_db)):
     db.commit()
     db.refresh(article)
     return article
-
