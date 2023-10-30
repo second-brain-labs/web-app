@@ -1,0 +1,54 @@
+.home-container {
+    display: flex;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.home-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.sidebar {
+    flex: 1;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+}
+
+.upload-btn {
+    display: block;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.categories > div {
+    margin-bottom: 15px;
+    cursor: pointer;
+    color: #555;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.categories > div:hover {
+    background-color: #eee;
+}
+
+.main-content {
+    flex: 3;
+    padding: 20px;
+}
