@@ -1,7 +1,7 @@
 from app.db import get_db
 from fastapi import APIRouter, Depends
 from app.models import UserModel, DirectoryModel
-from app.schemas import UserSchema, UserCreateSchema
+from app.schemas.users import UserSchema, UserCreateSchema
 
 router = APIRouter(prefix="/users")
 

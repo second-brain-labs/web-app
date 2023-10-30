@@ -3,7 +3,7 @@ import shutil
 from app.db import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models import ArticleModel, DirectoryModel
-from app.schemas import ArticleSchema, ArticleCreateSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema
+from app.schemas.articles import ArticleSchema, ArticleCreateSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema
 import PyPDF2
 import random
 from transformers import AutoTokenizer, AutoModelWithLMHead
