@@ -39,6 +39,9 @@ async def get_folders(name: str, user_id: str, db=Depends(get_db)):
 
 def _get_parent_directory(directory: str):
     tree = directory.split("/")
+    if len(tree) == 1:
+        return "/"
+
     return "/".join(tree[:-1])
 
 @router.post("/directory/create", response_model=DirectoryInfoSchema)
@@ -46,7 +49,16 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
     """
     Create a directory a/b/c/d
     """
-    directory = DirectoryModel(name=directory.name, user_id=directory.user_id, parent_directory=_get_parent_directory(directory.name))
+    # check if directory exists
+    existing_directory : DirectoryModel = db.query(DirectoryModel).filter(DirectoryModel.name == directory.name, DirectoryModel.user_id == directory.user_id).first()
+    if existing_directory:
+        return existing_directory
+
+    if directory.name == "/":
+        directory = DirectoryModel(name=directory.name, user_id=directory.user_id)
+    else:
+        directory = DirectoryModel(name=directory.name, user_id=directory.user_id, parent_directory=_get_parent_directory(directory.name))
+
     db.add(directory)
     db.commit()
     db.refresh(directory)
@@ -61,6 +73,8 @@ async def create_article(article: ArticleCreateSchema, db=Depends(get_db)):
     if directory is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Directory not found")
     article = ArticleModel(title=article.title, url=article.url, user_id=article.user_id, directory=article.directory, content=article.content)
+    # mock summary
+    article.summary = "This is a summary"
     db.add(article)
     db.commit()
     db.refresh(article)

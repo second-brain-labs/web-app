@@ -12,6 +12,7 @@ sqlalchemy = "^2.0.22"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.3"
+requests = "^2.31.0"
 
 [build-system]
 requires = ["poetry-core"]
