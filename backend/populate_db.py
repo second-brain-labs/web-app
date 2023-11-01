@@ -46,19 +46,20 @@ def create_user(url, name, email, password):
         print(f"{response.status_code} {response.reason} for user {name}")
     return response.json()
 
-def create_article(url, title, url_, user_id, directory, content):
+def create_article(url, title, url_, user_uuid, directory, content):
 
     # check if article exists
-    articles_by_user = requests.get(f"{url}/articles/user/{user_id}")
+    articles_by_user = requests.get(f"{url}/articles/user/{user_uuid}")
+    print(articles_by_user.json())
     for article in articles_by_user.json():
         if article["title"] == title:
-            print(f"Article {title} already exists for user {user_id}. Skipping...")
+            print(f"Article {title} already exists for user {user_uuid}. Skipping...")
             return article
     title = quote(title)
     url_ = quote(url_)
     directory = quote(directory)
 
-    response = requests.post(f"{url}/articles/article/create?title={title}&url={url_}&user_id={user_id}&directory={directory}", json={"content": content})
+    response = requests.post(f"{url}/articles/article/create?title={title}&url={url_}&user_uuid={user_uuid}&directory={directory}", json={"content": content})
     if response.status_code < 300:
         print(f"Article {title} created successfully!")
     else:
@@ -67,8 +68,8 @@ def create_article(url, title, url_, user_id, directory, content):
 
     return response.json()
 
-def create_directory(url, name, user_id):
-    directory = {"name": name, "user_id": user_id}
+def create_directory(url, name, user_uuid):
+    directory = {"name": name, "user_uuid": user_uuid}
     response = requests.post(f"{url}/articles/directory/create", json=directory)
     if response.status_code < 300:
         print(f"Directory {name} created successfully!")
@@ -83,9 +84,9 @@ if __name__ == "__main__":
     url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
     user1 = create_user(url, "John Doe", "johndoe@gmail.com", "password")
     user2 = create_user(url, "Jane Doe", "janedoe@gmail.com", "password")
-    create_directory(url, "directory1", user1["id"])
-    create_directory(url, "directory1/subdirectory1", user1["id"])
-    create_article(url, "Article 1", "https://www.google.com", user1["id"], "directory1", short_article_1)
-    create_article(url, "Article 2", "https://www.google.com", user1["id"], "directory1/subdirectory1", short_article_2)
-    create_article(url, "Article 3", "https://www.google.com", user2["id"], "/", short_article_3)
+    create_directory(url, "directory1", user1["uuid"])
+    create_directory(url, "directory1/subdirectory1", user1["uuid"])
+    create_article(url, "Article 1", "https://www.google.com", user1["uuid"], "directory1", short_article_1)
+    create_article(url, "Article 2", "https://www.google.com", user1["uuid"], "directory1/subdirectory1", short_article_2)
+    create_article(url, "Article 3", "https://www.google.com", user2["uuid"], "/", short_article_3)
     print("Database populated successfully!")

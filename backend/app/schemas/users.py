@@ -9,7 +9,7 @@ class UserCreateSchema(UserBaseSchema):
     password: str
 
 class UserSchema(UserBaseSchema):
-    id: int
+    uuid: str
 
     class Config:
         from_attributes = True
