@@ -9,6 +9,8 @@ class UserModel(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # once we move to postgres, we can use the Uuid datatype instead of string.
     uuid = Column(String, unique=True, index=True, default=lambda x: str(uuid_pkg.uuid4()))
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
