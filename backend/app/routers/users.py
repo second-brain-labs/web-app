@@ -5,10 +5,10 @@ from app.schemas.users import UserSchema, UserCreateSchema
 
 router = APIRouter(prefix="/users")
 
-@router.get("/{user_id}", response_model=UserSchema)
-async def get_user(user_id: int, db=Depends(get_db)):
+@router.get("/{user_uuid}", response_model=UserSchema)
+async def get_user(user_uuid: int, db=Depends(get_db)):
 
-    user : UserModel = db.query(UserModel).filter(UserModel.id == user_id).first()
+    user : UserModel = db.query(UserModel).filter(UserModel.uuid == user_uuid).first()
 
     return user
 
@@ -22,8 +22,14 @@ async def create_dummy_user(user: UserCreateSchema, db=Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
-    directory : DirectoryModel = DirectoryModel(name="/", user_id=user.id)
+    directory : DirectoryModel = DirectoryModel(name="/", user_uuid=user.uuid)
     db.add(directory)
     db.commit()
 
     return user
+
+@router.get("/dummy/all")
+async def dummy_get_users(db=Depends(get_db)):
+    # DUMMY ROUTE
+    users : list[UserModel] = db.query(UserModel).all()
+    return users

@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class ArticleBaseSchema(BaseModel):
     title: str = Form(...)
-    user_id: int = Form(...)
+    user_uuid: str = Form(...)
     directory: str = Form(...)
 
 class ArticleCreatePDFSchema(ArticleBaseSchema):
@@ -30,7 +30,7 @@ class ArticleContentSchema(ArticleSchema):
 
 class DirectoryCreateSchema(BaseModel):
     name: str
-    user_id: int
+    user_uuid: str
 
 class DirectoryInfoSchema(DirectoryCreateSchema):
     parent_directory: str
