@@ -50,7 +50,6 @@ def create_article(url, title, url_, user_uuid, directory, content):
 
     # check if article exists
     articles_by_user = requests.get(f"{url}/articles/user/{user_uuid}")
-    print(articles_by_user.json())
     for article in articles_by_user.json():
         if article["title"] == title:
             print(f"Article {title} already exists for user {user_uuid}. Skipping...")

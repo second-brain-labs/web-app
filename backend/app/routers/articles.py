@@ -76,7 +76,7 @@ def handle_article(db, title, user_uuid, directory, content, url=None):
         max_length=512,
         truncation=True
     )
-    summary_ids = model.generate(inputs, max_length=200, length_penalty=5., num_beams=2)
+    summary_ids = model.generate(inputs, max_length=250, length_penalty=5., num_beams=2)
 
     summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
 
