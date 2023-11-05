@@ -1,3 +1,4 @@
+import json
 import requests
 import sys
 from urllib.parse import quote
@@ -79,13 +80,24 @@ def create_directory(url, name, user_uuid):
     return response.json()
 
 
+
 if __name__ == "__main__":
     url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
     user1 = create_user(url, "John Doe", "johndoe@gmail.com", "password")
     user2 = create_user(url, "Jane Doe", "janedoe@gmail.com", "password")
-    create_directory(url, "directory1", user1["uuid"])
-    create_directory(url, "directory1/subdirectory1", user1["uuid"])
-    create_article(url, "Article 1", "https://www.google.com", user1["uuid"], "directory1", short_article_1)
-    create_article(url, "Article 2", "https://www.google.com", user1["uuid"], "directory1/subdirectory1", short_article_2)
+    create_directory(url, "dogs", user1["uuid"])
+    create_directory(url, "dogs/golden-retrievers", user1["uuid"])
+    create_directory(url, "cats", user1["uuid"])
+    create_directory(url, "cs", user1["uuid"])
+
+    create_directory(url, "cs", user2["uuid"])
+    with open('data/john_doe_articles.json', 'r') as f:
+        data = json.load(f)
+
+    for article in data['articles']:
+        with open(f"data/{article['id']}.txt", 'r') as f:
+            content = f.read()
+        create_article(url, article["title"], article["url"], user1["uuid"], article["directory"], content)
     create_article(url, "Article 3", "https://www.google.com", user2["uuid"], "/", short_article_3)
+    create_article(url, "Article 4", "https://www.google.com", user2["uuid"], "cs", short_article_1)
     print("Database populated successfully!")

@@ -21,11 +21,16 @@ async def get_articles(user_uuid: str, db=Depends(get_db)):
 @router.get("/article/{article_id}", response_model=ArticleSchema)
 async def get_article(article_id: int, db=Depends(get_db)):
     article : ArticleModel = db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+    if article is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
     return article
 
 @router.get("/article/{article_id}/content", response_model=ArticleContentSchema)
 async def get_article_content(article_id: int, db=Depends(get_db)):
     article : ArticleModel = db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+    if article is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
+
     return article
 
 @router.get("/directory/articles", response_model=list[ArticleSchema])
@@ -59,7 +64,11 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
     if directory.name == "/":
         directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid)
     else:
-        directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid, parent_directory=_get_parent_directory(directory.name))
+        parent_dir = _get_parent_directory(directory.name)
+        parent_directory : DirectoryModel = db.query(DirectoryModel).filter(DirectoryModel.name == parent_dir, DirectoryModel.user_uuid == directory.user_uuid).first()
+        if parent_directory is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent directory not found")
+        directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid, parent_directory=parent_dir)
 
     db.add(directory)
     db.commit()
