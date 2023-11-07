@@ -7,7 +7,7 @@ interface ArticleProps {
     onClick: () => void;
 }
 
-const ArticleCard: React.FC<ArticleProps> = ({ title, onClick }) => {
+const ArticleCard = ({ title, onClick }: ArticleProps) => {
     return (
         <div className="article-card" onClick={onClick}>
             <img src={ArticleImg} alt={title} className="article-image"/>
