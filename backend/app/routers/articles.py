@@ -3,7 +3,7 @@ import shutil
 from app.db import get_db
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from app.models import ArticleModel, DirectoryModel
-from app.schemas.articles import ArticleSchema, ArticleCreatePDFSchema, ArticleContentSchema, DirectoryInfoSchema, DirectoryCreateSchema, ArticleCreateHTMLSchema
+from app.schemas.articles import ArticleSchema, ArticleCreatePDFSchema, ArticleContentSchema, DirectoryArticlesAndSubdirectoriesSchema, DirectoryInfoSchema, DirectoryCreateSchema, ArticleCreateHTMLSchema
 import PyPDF2
 import random
 from transformers import AutoTokenizer, AutoModelWithLMHead
@@ -42,6 +42,13 @@ async def get_articles_by_directory(name: str, user_uuid: str, db=Depends(get_db
 async def get_folders(name: str, user_uuid: str, db=Depends(get_db)):
     directories : list[DirectoryModel] = db.query(DirectoryModel).filter(DirectoryModel.parent_directory == name, DirectoryModel.user_uuid == user_uuid).all()
     return directories
+
+@router.get("/directory/all", response_model=DirectoryArticlesAndSubdirectoriesSchema)
+async def get_articles_and_folders(name: str, user_uuid: str, db=Depends(get_db)):
+    directories : list[DirectoryModel] = db.query(DirectoryModel).filter(DirectoryModel.parent_directory == name, DirectoryModel.user_uuid == user_uuid).all()
+    articles : list[ArticleModel] = db.query(ArticleModel).filter(ArticleModel.directory == name, ArticleModel.user_uuid == user_uuid).all()
+    return DirectoryArticlesAndSubdirectoriesSchema(articles=articles, subdirectories=directories)
+
 
 
 def _get_parent_directory(directory: str):

@@ -37,3 +37,11 @@ class DirectoryInfoSchema(DirectoryCreateSchema):
 
     class Config:
         from_attributes = True
+
+
+class DirectoryArticlesAndSubdirectoriesSchema(BaseModel):
+    articles: list[ArticleSchema]
+    subdirectories: list[DirectoryInfoSchema]
+
+    class Config:
+        from_attributes = True
