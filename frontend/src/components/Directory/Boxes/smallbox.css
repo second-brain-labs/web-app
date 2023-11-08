@@ -1,0 +1,19 @@
+.file{
+    width: 100px;
+    height: 100px;
+    border-radius: 15px;
+    background: #FFFFFF;
+    box-shadow: 0px 0px 4px 0px #00000040;
+    padding: "20px";
+}
+
+.font{
+    font-family: IBM Plex Sans;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: #000000;
+
+}
