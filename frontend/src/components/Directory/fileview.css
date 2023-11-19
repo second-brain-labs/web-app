@@ -1,10 +1,11 @@
 .fileview{
     background: "#F2F2F2";
     box-shadow: 0px 0px 4px 0px #00000040 inset;
-    width: 1091px;
-    height: 816px;
-    top: 113px;
-    left: 564px;
+    width: 90%;
+    height: 80vh;
     border-radius: 12px;
+}
 
+.search{
+    border-radius: 50px;
 }
