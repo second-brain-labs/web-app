@@ -37,8 +37,7 @@ const FileView = () => {
        <Stack className='fileview'>
 
            <Box sx={{borderRadius: "100px"}}>
-               <TextField placeholder='Type to run a search (e.g. articles about collagen from between 2018 and 2020)' sx={{width: "1052px",
-
+               <TextField className='search' placeholder='Type to run a search (e.g. articles about collagen from between 2018 and 2020)' sx={{width: "100%",
             }}></TextField>
            </Box>
 
@@ -51,7 +50,8 @@ const FileView = () => {
            container
            rowGap={"20px"}
            columnGap={"30px"}
-           padding={"10px"}
+           paddingLeft={"70px"}
+           overflow={"auto"}
            >
                {temp.map((x) => <>
                {true &&
