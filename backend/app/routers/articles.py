@@ -63,11 +63,10 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
     """
     Create a directory a/b/c/d
     """
-    # check if directory exists
+    #check if directory exists
     existing_directory : DirectoryModel = db.query(DirectoryModel).filter(DirectoryModel.name == directory.name, DirectoryModel.user_uuid == directory.user_uuid).first()
     if existing_directory:
-        return existing_directory
-
+       return existing_directory
     if directory.name == "/":
         directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid)
     else:
@@ -76,7 +75,6 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
         if parent_directory is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent directory not found")
         directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid, parent_directory=parent_dir)
-
     db.add(directory)
     db.commit()
     db.refresh(directory)

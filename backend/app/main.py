@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from app import models
 from app.db import engine
 from app.routers import users, articles
+from fastapi.middleware.cors import CORSMiddleware
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -15,6 +16,18 @@ api = FastAPI()
 
 api.include_router(users.router)
 api.include_router(articles.router)
+
+origins = [
+    "http://localhost:3000",
+]
+
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 

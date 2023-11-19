@@ -9,9 +9,21 @@ import FileView from '../../components/Directory/FileView';
 import Chat from '../../components/Chat/Chat';
 import { IconButton } from '@mui/material';
 import CreateIcon from '@mui/icons-material/Create';
+import axios from "axios";
 
 
 const HomePage = () => {
+    const [user, setUser] = useState("");
+
+    const getUsername = async (userID: string) => {
+        const response = axios.get(`http://localhost:3500/users/${userID}`);
+        const data = (await response).data;
+        setUser(data.name);
+    }
+    const userID = "1";
+    useEffect(()=>{
+        getUsername(userID);
+    }, []);
 
     const [isOpen, setIsOpen] = useState(false);
     const [currentArticle, setCurrentArticle] = useState(1);
@@ -24,10 +36,6 @@ const HomePage = () => {
     const handleClose = () => {
         setIsOpen(false);
     }
-
-    useEffect(() => {
-
-    }, []);
 
     return (
         <Stack direction={"row"}
@@ -57,7 +65,7 @@ const HomePage = () => {
                     <Stack
                         direction={"row"}
                         >
-                        <Typography>Rohan Gupta</Typography>
+                        <Typography>{"string"}</Typography>
                     </Stack>
                 </Stack>
                 <FileView/>

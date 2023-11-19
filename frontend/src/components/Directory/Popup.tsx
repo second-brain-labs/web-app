@@ -4,8 +4,8 @@ import React from 'react';
 
 interface ModalProps {
     handleClose: () => void,
-    x: string,
-    open: string,
+    x: number,
+    open: number,
     title: string,
     summary: string,
 }

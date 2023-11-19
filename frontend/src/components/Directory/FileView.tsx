@@ -8,30 +8,39 @@ import IFile from '../../types/file';
 import ILink from '../../types/link';
 import Popup from './Popup';
 import SpaceBox from './Boxes/SpaceBox';
-
-
-
-
+import axios from "axios";
 
 const FileView = () => {
 
     
 
+    const [articles, setArticles] = useState<IFile[]>([]);
+    const [folders, setFolders] = useState([]);
+
+    const fetchArticlesFolders = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3500/articles/directory/all?name=string&user_uuid=1`);
+          const data = (await response).data
+          setArticles(data.articles);
+          setFolders(data.subdirectories);
+        } catch (err) {
+          console.error(err);
+        }
+    };
+
+
     useEffect(() => {
-        //fetch data for current space
-
+        fetchArticlesFolders();
     }, []);
-    const temp = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
-    const [open, setOpen] = useState("-1");
+    const [open, setOpen] = useState(-1);
 
-    const handleOpen = (x: string) => {
+    const handleOpen = (x: number) => {
         setOpen(x);
-        console.log("bro");
     }
 
     const handleClose = () => {
-        setOpen("-1");
+        setOpen(-1);
     }
     return (
        <Stack className='fileview'>
@@ -53,11 +62,11 @@ const FileView = () => {
            paddingLeft={"70px"}
            overflow={"auto"}
            >
-               {temp.map((x) => <>
+               {articles.map((x) => <>
                {true &&
                 <>
-                    <SmallBox onClick={() => handleOpen(x)} title={x} type={"folder"}/>
-                    <Popup title="Link title" summary="Lorem ipsum" handleClose={handleClose} x={x} open={open}/>
+                    <SmallBox onClick={() => handleOpen(x.id)} title={x.title} type={"file"}/>
+                    <Popup title="Link title" summary="Lorem ipsum" handleClose={handleClose} x={x.id} open={open}/>
                 </>
                }
                {false &&
