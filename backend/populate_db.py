@@ -38,17 +38,17 @@ The former Barcelona and Paris St-Germain star added: "I couldn't imagine having
 """
 
 
-def create_user(url, name, email, password):
-    user = {"name": name, "email": email, "password": password}
-    response = requests.post(f"{url}/users/dummy/create", json=user)
+def create_user(url, name, email):
+    user = {"name": name, "email": email}
+    response = requests.post(f"{url}/users/login", json=user)
     if response.status_code < 300:
         print(f"User {name} created successfully!")
     else:
         print(f"{response.status_code} {response.reason} for user {name}")
     return response.json()
 
-def create_article(url, title, url_, user_uuid, directory, content):
 
+def create_article(url, title, url_, user_uuid, directory, content):
     # check if article exists
     articles_by_user = requests.get(f"{url}/articles/user/{user_uuid}")
     for article in articles_by_user.json():
@@ -59,7 +59,10 @@ def create_article(url, title, url_, user_uuid, directory, content):
     url_ = quote(url_)
     directory = quote(directory)
 
-    response = requests.post(f"{url}/articles/article/create?title={title}&url={url_}&user_uuid={user_uuid}&directory={directory}", json={"content": content})
+    response = requests.post(
+        f"{url}/articles/article/create?title={title}&url={url_}&user_uuid={user_uuid}&directory={directory}",
+        json={"content": content},
+    )
     if response.status_code < 300:
         print(f"Article {title} created successfully!")
     else:
@@ -67,6 +70,7 @@ def create_article(url, title, url_, user_uuid, directory, content):
         print(response.json())
 
     return response.json()
+
 
 def create_directory(url, name, user_uuid):
     directory = {"name": name, "user_uuid": user_uuid}
@@ -76,28 +80,37 @@ def create_directory(url, name, user_uuid):
     else:
         print(f"{response.status_code} {response.reason} for directory {name}")
 
-
     return response.json()
-
 
 
 if __name__ == "__main__":
     url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
-    user1 = create_user(url, "John Doe", "johndoe@gmail.com", "password")
-    user2 = create_user(url, "Jane Doe", "janedoe@gmail.com", "password")
+    user1 = create_user(url, "John Doe", "johndoe@gmail.com")
+    user2 = create_user(url, "Jane Doe", "janedoe@gmail.com")
     create_directory(url, "dogs", user1["uuid"])
     create_directory(url, "dogs/golden-retrievers", user1["uuid"])
     create_directory(url, "cats", user1["uuid"])
     create_directory(url, "cs", user1["uuid"])
 
     create_directory(url, "cs", user2["uuid"])
-    with open('data/john_doe_articles.json', 'r') as f:
+    with open("data/john_doe_articles.json", "r") as f:
         data = json.load(f)
 
-    for article in data['articles']:
-        with open(f"data/{article['id']}.txt", 'r') as f:
+    for article in data["articles"]:
+        with open(f"data/{article['id']}.txt", "r") as f:
             content = f.read()
-        create_article(url, article["title"], article["url"], user1["uuid"], article["directory"], content)
-    create_article(url, "Article 3", "https://www.google.com", user2["uuid"], "/", short_article_3)
-    create_article(url, "Article 4", "https://www.google.com", user2["uuid"], "cs", short_article_1)
+        create_article(
+            url,
+            article["title"],
+            article["url"],
+            user1["uuid"],
+            article["directory"],
+            content,
+        )
+    create_article(
+        url, "Article 3", "https://www.google.com", user2["uuid"], "/", short_article_3
+    )
+    create_article(
+        url, "Article 4", "https://www.google.com", user2["uuid"], "cs", short_article_1
+    )
     print("Database populated successfully!")
