@@ -1,13 +1,14 @@
-import { Grid, Stack } from '@mui/material';
+import { Grid, Stack, TextField } from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import "./fileview.css";
 import SmallBox from "./Boxes/SmallBox"
-import { Box, Modal, Typography } from '@mui/material';
+import { Button, Box, Modal, Typography } from '@mui/material';
 import ISpace from '../../types/space';
 import IFile from '../../types/file';
 import ILink from '../../types/link';
 import Popup from './Popup';
 import SpaceBox from './Boxes/SpaceBox';
+
 
 
 
@@ -35,16 +36,27 @@ const FileView = () => {
     return (
        <Stack className='fileview'>
 
+           <Box sx={{borderRadius: "100px"}}>
+               <TextField className='search' placeholder='Type to run a search (e.g. articles about collagen from between 2018 and 2020)' sx={{width: "100%",
+            }}></TextField>
+           </Box>
+
+           <Stack direction={"row"}>
+            <Button variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Add to this space</Button>
+            <Button variant="contained" color="success" sx={{borderRadius: "12px"}}>Smart categorize my view</Button>
+           </Stack>
+
            <Grid
            container
            rowGap={"20px"}
            columnGap={"30px"}
-           padding={"10px"}
+           paddingLeft={"70px"}
+           overflow={"auto"}
            >
                {temp.map((x) => <>
                {true &&
                 <>
-                    <SmallBox onClick={() => handleOpen(x)} title={x} type={"file"}/>
+                    <SmallBox onClick={() => handleOpen(x)} title={x} type={"folder"}/>
                     <Popup title="Link title" summary="Lorem ipsum" handleClose={handleClose} x={x} open={open}/>
                 </>
                }
