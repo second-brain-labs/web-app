@@ -23,10 +23,10 @@ const SmallBox = ({title, type, onClick}: ISmallBoxProps) => {
                 <img className='image' src={file} />
                 }
                 {type == "folder" &&
-                <img src={folder} />
+                <img className='image' src={folder} />
                 }
                 {type == "link" &&
-                <img src={link} />
+                <img className='image' src={link} />
                 }
                 <Typography className='font'>{title}</Typography>
             </Stack>

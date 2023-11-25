@@ -6,7 +6,7 @@ from app.schemas.users import UserSchema, UserCreateSchema
 router = APIRouter(prefix="/users")
 
 @router.get("/{user_uuid}", response_model=UserSchema)
-async def get_user(user_uuid: int, db=Depends(get_db)):
+async def get_user(user_uuid: str, db=Depends(get_db)):
 
     user : UserModel = db.query(UserModel).filter(UserModel.uuid == user_uuid).first()
 

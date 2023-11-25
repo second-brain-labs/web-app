@@ -5,21 +5,27 @@ import SmallBox from "./Boxes/SmallBox"
 import { Button, Box, Modal, Typography } from '@mui/material';
 import ISpace from '../../types/space';
 import IFile from '../../types/file';
+import IFolder from '../../types/folder';
 import ILink from '../../types/link';
 import Popup from './Popup';
 import SpaceBox from './Boxes/SpaceBox';
 import axios from "axios";
 
-const FileView = () => {
+interface IFileviewProps{
+    user_uuid: string,
+  }
+  
 
-    
+const FileView = ({user_uuid}: IFileviewProps) => {
+
+    const [path, setPath] = useState<string>("/");
 
     const [articles, setArticles] = useState<IFile[]>([]);
-    const [folders, setFolders] = useState([]);
+    const [folders, setFolders] = useState<IFolder[]>([]);
 
     const fetchArticlesFolders = async () => {
         try {
-          const response = await axios.get(`http://localhost:3500/articles/directory/all?name=string&user_uuid=1`);
+          const response = await axios.get(`http://localhost:3500/articles/directory/all?name=${path}&user_uuid=${user_uuid}`);
           const data = (await response).data
           setArticles(data.articles);
           setFolders(data.subdirectories);
@@ -28,20 +34,28 @@ const FileView = () => {
         }
     };
 
-
     useEffect(() => {
         fetchArticlesFolders();
-    }, []);
+    }, [path]);
 
-    const [open, setOpen] = useState(-1);
+    const [open, setOpen] = useState("-1");
 
-    const handleOpen = (x: number) => {
+    const handleOpen = (x: string) => {
         setOpen(x);
     }
 
     const handleClose = () => {
-        setOpen(-1);
+        setOpen("-1");
     }
+
+    const handleFolderClick = (parent: string, name: string) => {
+        if (parent === undefined){
+            parent = "/";
+        }
+        const newPath = parent + name;
+        setPath(newPath);
+    }
+
     return (
        <Stack className='fileview'>
 
@@ -66,12 +80,20 @@ const FileView = () => {
                {true &&
                 <>
                     <SmallBox onClick={() => handleOpen(x.id)} title={x.title} type={"file"}/>
-                    <Popup title="Link title" summary="Lorem ipsum" handleClose={handleClose} x={x.id} open={open}/>
+                    <Popup title={x.title} summary={x.summary} handleClose={handleClose} x={x.id} open={open}/>
                 </>
                }
                {false &&
                 <>
                     <SpaceBox title="bro" type="folder" />
+                </>
+               }
+           </>
+           )}
+           {folders.map((x) => <>
+               {true &&
+                <>
+                    <SmallBox onClick={() => handleFolderClick(x.parent, x.name)} title={x.name} type={"folder"}/>
                 </>
                }
            </>

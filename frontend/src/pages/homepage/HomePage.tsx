@@ -20,7 +20,7 @@ const HomePage = () => {
         const data = (await response).data;
         setUser(data.name);
     }
-    const userID = "1";
+    const userID = "e0db2e0b-e3eb-484e-b96d-edaf9ae04fc2";
     useEffect(()=>{
         getUsername(userID);
     }, []);
@@ -48,8 +48,9 @@ const HomePage = () => {
                 <Chat/>
             </Stack>
 
-            <Stack sx={{width: "100%", height: "100%"}}>
+            <Stack sx={{width: "90%", height: "100%"}}>
                 <Stack
+                sx={{width: "90%", height: "100%"}}
                 direction={"row"}
                 justifyContent={"space-between"}
                 >
@@ -58,17 +59,14 @@ const HomePage = () => {
                         sx={{width: "100%", height: "100%"}}
                         >
                         <Typography>Space Title</Typography>
-                        <IconButton>
-                            <CreateIcon/>
-                        </IconButton>
                     </Stack>
                     <Stack
                         direction={"row"}
                         >
-                        <Typography>{"string"}</Typography>
+                        <Typography>{user}</Typography>
                     </Stack>
                 </Stack>
-                <FileView/>
+                <FileView user_uuid={userID}/>
             </Stack>
 
         </Stack>

@@ -6,7 +6,7 @@
     user_id: string,
     directory: string,
     summary: string,
-    id: number,
+    id: string,
     time_created: Date;
   }
   
