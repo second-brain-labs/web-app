@@ -23,7 +23,7 @@ const CreateFolderModal = ({handleClose, open, userId, setCreate, created, path}
 
     const createFolder = async() => {
         try{
-            const createPath = (path !== null) ? path + "/" + name : name;
+            const createPath = (path !== null && path !== "/") ? path + "/" + name : name;
             await axios.post(`http://localhost:3500/articles/directory/create`, {
             name: createPath,
             user_uuid: userId,

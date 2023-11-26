@@ -79,10 +79,8 @@ const FileView = ({user_uuid}: IFileviewProps) => {
        <Stack className='fileview'>
 
            <Box sx={{borderRadius: "100px"}}>
-               <TextField className='search' placeholder='Type to run a search (e.g. articles about collagen from between 2018 and 2020)' sx={{width: "100%",
-            }}></TextField>
+               <TextField className='search' placeholder='Type to run a search (e.g. articles about collagen from between 2018 and 2020)' sx={{width: "100%",}}/>
            </Box>
-
            <Stack direction={"row"}>
             <Button onClick={handleClose} variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Add to this space</Button>
             <Button variant="contained" color="success" sx={{borderRadius: "12px"}}>Smart categorize my view</Button>
