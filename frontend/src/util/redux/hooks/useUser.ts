@@ -17,10 +17,19 @@ export function useUser() {
     }));
   };
 
+  const userLogout = () => {
+    // Perform login logic and dispatch setAuth with true
+    dispatch(setUser({
+        name: null,
+        user_uuid: null,
+    }));
+  };
+
 
   return {
     username,
     userID,
     newUserLogin,
+    userLogout,
   };
 }

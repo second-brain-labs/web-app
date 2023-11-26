@@ -1,6 +1,6 @@
 import { Box, Stack } from '@mui/material';
 import React from 'react';
-import "../../styles/chat.css";
+import "../../util/styles/chat.css";
 
 
 const Chat = () => {

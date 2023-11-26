@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton, Modal, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Modal, Stack, Typography } from '@mui/material';
 import React from 'react';
 
 
@@ -33,7 +33,6 @@ const Popup = ({handleClose, x, open, title, summary}: ModalProps) => {
                         <Stack>
                             <Stack direction="row" justifyContent="center"
   alignItems="center">
-                                <img></img>
                                 <Typography>{title}</Typography>
                                 <IconButton>
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from './redux/hooks/useAuth';
+import { useAuth } from './util/redux/hooks/useAuth';
 
 interface PrivateRouteProps {
   children: React.ReactNode;

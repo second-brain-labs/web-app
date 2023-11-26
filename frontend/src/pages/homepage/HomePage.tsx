@@ -1,17 +1,27 @@
 import React from 'react';
-import '../../styles/homepage.css';
-import { Stack, Typography } from '@mui/material';
+import '../../util/styles/homepage.css';
+import { Button, Stack, Typography } from '@mui/material';
 import Logo from '../../components/Shared/Logo';
 import DropDown from '../../components/Shared/DropDown';
 import FileView from '../../components/Directory/FileView';
 import Chat from '../../components/Chat/Chat';
-import { useUser } from '../../redux/hooks/useUser';
+import { useUser } from '../../util/redux/hooks/useUser';
+import { useAuth } from '../../util/redux/hooks/useAuth';
+import { useSearchParams } from 'react-router-dom';
 
 
 const HomePage = () => {
 
     
-    const {userID, username} = useUser();
+    const {userID, username, userLogout} = useUser();
+    const {logout} = useAuth();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const handleLogout = () => {
+        logout();
+        userLogout();
+    }
 
 
     return (
@@ -35,7 +45,7 @@ const HomePage = () => {
                         direction={"row"}
                         sx={{ width: "100%", height: "100%" }}
                     >
-                        <Typography>Space Title</Typography>
+                        <Typography>{searchParams.get("path")}</Typography>
                     </Stack>
                     <Stack
                         direction={"row"}
@@ -45,6 +55,10 @@ const HomePage = () => {
                 </Stack>
                 <FileView user_uuid={userID!}/>
             </Stack>
+            <Stack>
+                <Button onClick={handleLogout} variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Logout</Button>
+            </Stack>
+            
 
         </Stack>
     );

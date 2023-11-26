@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, Link, Typography } from '@mui/material';
-import "../../styles/footer.css";
+import "../../util/styles/footer.css";
 
 
 

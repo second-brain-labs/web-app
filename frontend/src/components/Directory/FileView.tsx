@@ -2,17 +2,14 @@ import { Grid, Stack, TextField } from '@mui/material';
 import React, {useEffect, useState} from 'react';
 import "./fileview.css";
 import SmallBox from "./Boxes/SmallBox"
-import { Button, Box, Modal, Typography } from '@mui/material';
-import ISpace from '../../types/space';
-import IFile from '../../types/file';
-import IFolder from '../../types/folder';
-import ILink from '../../types/link';
-import Popup from './Popup';
+import { Button, Box, } from '@mui/material';
+import IFile from '../../util/types/file';
+import IFolder from '../../util/types/folder';
+import Popup from './Modals/FilePopupModal';
 import SpaceBox from './Boxes/SpaceBox';
 import axios from "axios";
-import CreateFolderModal from './CreateFolderModal';
-import { useParams } from 'react-router-dom';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import CreateFolderModal from './Modals/CreateFolderModal';
+import { useSearchParams } from 'react-router-dom';
 
 
 

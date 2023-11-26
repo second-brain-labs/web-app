@@ -1,9 +1,8 @@
-import { Box,Button, Grid, IconButton, Modal, Stack, TablePagination, Tabs, TextField, Typography } from '@mui/material';
+import { Box,Button, Modal, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import axios from "axios";
 import { Dispatch } from 'react';
 import { SetStateAction } from 'react';
-import { useParams } from 'react-router-dom';
 
 
 
@@ -25,7 +24,7 @@ const CreateFolderModal = ({handleClose, open, userId, setCreate, created, path}
     const createFolder = async() => {
         try{
             const createPath = (path !== null) ? path + "/" + name : name;
-            const response = await axios.post(`http://localhost:3500/articles/directory/create`, {
+            await axios.post(`http://localhost:3500/articles/directory/create`, {
             name: createPath,
             user_uuid: userId,
             }   
