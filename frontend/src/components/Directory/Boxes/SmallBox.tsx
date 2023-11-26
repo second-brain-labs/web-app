@@ -19,16 +19,16 @@ const SmallBox = ({title, type, onClick}: ISmallBoxProps) => {
     return (
         <Box onClick={onClick}  className="file" sx={{ border: 1, padding: "10px", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <Stack>
-                {type == "file" &&
+                {type === "file" &&
                 <img className='image' src={file} />
                 }
-                {type == "folder" &&
+                {type === "folder" &&
                 <img className='image' src={folder} />
                 }
-                {type == "link" &&
+                {type === "link" &&
                 <img className='image' src={link} />
                 }
-                <Typography className='font'>{title}</Typography>
+                <Typography className='font'>{(title.split('/').length > 0) ? (title.split('/').slice(-1)) : title}</Typography>
             </Stack>
         </Box>  
     );

@@ -8,11 +8,22 @@ class ArticleBaseSchema(BaseModel):
     user_uuid: str = Form(...)
     directory: str = Form(...)
 
+
 class ArticleCreatePDFSchema(ArticleBaseSchema):
     uploaded_file: UploadFile = Form(...)
 
-class ArticleCreateHTMLSchema(ArticleBaseSchema):
-    url: str = Form(...)
+
+# class ArticleCreateHTMLSchema(ArticleBaseSchema):
+#     url: str = Form(...)
+
+
+class ArticleCreateHTMLSchema(BaseModel):
+    title: str
+    user_uuid: str
+    directory: str
+    url: str
+    content: str
+
 
 class ArticleSchema(ArticleBaseSchema):
     summary: str
@@ -22,18 +33,21 @@ class ArticleSchema(ArticleBaseSchema):
     class Config:
         from_attributes = True
 
+
 class ArticleContentSchema(ArticleSchema):
     content: str
 
     class Config:
         from_attributes = True
 
+
 class DirectoryCreateSchema(BaseModel):
     name: str
     user_uuid: str
 
+
 class DirectoryInfoSchema(DirectoryCreateSchema):
-    parent_directory: str
+    parent_directory: str | None
 
     class Config:
         from_attributes = True

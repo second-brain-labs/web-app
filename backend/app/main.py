@@ -30,10 +30,10 @@ api.add_middleware(
 )
 
 
-
 @api.get("/")
 async def root():
     return {"msg": "API is Online!"}
+
 
 if __name__ == "__main__":
     if os.environ.get("APP_ENV") == "development":

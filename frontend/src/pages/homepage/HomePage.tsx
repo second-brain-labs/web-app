@@ -10,19 +10,20 @@ import Chat from '../../components/Chat/Chat';
 import { IconButton } from '@mui/material';
 import CreateIcon from '@mui/icons-material/Create';
 import axios from "axios";
+import { useUser } from '../../redux/hooks/useUser';
 
 
 const HomePage = () => {
     const [user, setUser] = useState("");
 
     const getUsername = async (userID: string) => {
-        const response = axios.get(`http://localhost:3500/users/${userID}`);
+        const response = axios.get(`http://localhost:3500/users/me/${userID}`);
         const data = (await response).data;
         setUser(data.name);
     }
-    const userID = "e0db2e0b-e3eb-484e-b96d-edaf9ae04fc2";
+    const {userID} = useUser();
     useEffect(()=>{
-        getUsername(userID);
+        getUsername(userID!);
     }, []);
 
     const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +67,7 @@ const HomePage = () => {
                         <Typography>{user}</Typography>
                     </Stack>
                 </Stack>
-                <FileView user_uuid={userID}/>
+                <FileView user_uuid={userID!}/>
             </Stack>
 
         </Stack>

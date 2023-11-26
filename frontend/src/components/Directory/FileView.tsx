@@ -10,6 +10,13 @@ import ILink from '../../types/link';
 import Popup from './Popup';
 import SpaceBox from './Boxes/SpaceBox';
 import axios from "axios";
+import CreateFolderModal from './CreateFolderModal';
+import { useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
+
+
+
 
 interface IFileviewProps{
     user_uuid: string,
@@ -18,7 +25,20 @@ interface IFileviewProps{
 
 const FileView = ({user_uuid}: IFileviewProps) => {
 
-    const [path, setPath] = useState<string>("/");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const path = (searchParams.get('path') === null) ? "/": searchParams.get('path');
+    
+
+    
+
+    useEffect(()=> {
+        console.log(path);
+    }, []);
+
+
+
+    const [create, setCreate] = useState(false);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
 
     const [articles, setArticles] = useState<IFile[]>([]);
     const [folders, setFolders] = useState<IFolder[]>([]);
@@ -36,25 +56,27 @@ const FileView = ({user_uuid}: IFileviewProps) => {
 
     useEffect(() => {
         fetchArticlesFolders();
-    }, [path]);
+    }, [path, create]);
 
     const [open, setOpen] = useState("-1");
 
-    const handleOpen = (x: string) => {
+    const handleFileOpen = (x: string) => {
         setOpen(x);
     }
 
-    const handleClose = () => {
+    const handleFileClose = () => {
         setOpen("-1");
     }
 
-    const handleFolderClick = (parent: string, name: string) => {
-        if (parent === undefined){
-            parent = "/";
-        }
-        const newPath = parent + name;
-        setPath(newPath);
+    const handleClose = () => {
+        setCreateModalOpen(!createModalOpen);
+        console.log("bro");
     }
+
+    const handleFolderClick = (name: string) => {
+        setSearchParams({ path: name })
+    }
+    
 
     return (
        <Stack className='fileview'>
@@ -65,7 +87,7 @@ const FileView = ({user_uuid}: IFileviewProps) => {
            </Box>
 
            <Stack direction={"row"}>
-            <Button variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Add to this space</Button>
+            <Button onClick={handleClose} variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Add to this space</Button>
             <Button variant="contained" color="success" sx={{borderRadius: "12px"}}>Smart categorize my view</Button>
            </Stack>
 
@@ -79,8 +101,8 @@ const FileView = ({user_uuid}: IFileviewProps) => {
                {articles.map((x) => <>
                {true &&
                 <>
-                    <SmallBox onClick={() => handleOpen(x.id)} title={x.title} type={"file"}/>
-                    <Popup title={x.title} summary={x.summary} handleClose={handleClose} x={x.id} open={open}/>
+                    <SmallBox onClick={() => handleFileOpen(x.id)} title={x.title} type={"file"}/>
+                    <Popup title={x.title} summary={x.summary} handleClose={handleFileClose} x={x.id} open={open}/>
                 </>
                }
                {false &&
@@ -93,11 +115,12 @@ const FileView = ({user_uuid}: IFileviewProps) => {
            {folders.map((x) => <>
                {true &&
                 <>
-                    <SmallBox onClick={() => handleFolderClick(x.parent, x.name)} title={x.name} type={"folder"}/>
+                    <SmallBox onClick={() => handleFolderClick(x.name)} title={x.name} type={"folder"}/>
                 </>
                }
            </>
            )}
+           <CreateFolderModal path={path} setCreate={setCreate} created={create} open={createModalOpen} handleClose={handleClose} userId={user_uuid}/>
                
 
            </Grid>
