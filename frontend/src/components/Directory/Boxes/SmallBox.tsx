@@ -4,7 +4,6 @@ import "./smallbox.css";
 import file from '../../../assets/images/file.svg';
 import link from '../../../assets/images/link.svg';
 import folder from '../../../assets/images/folder.svg';
-import ".././image.css"
 
 interface ISmallBoxProps {
     title: string,
@@ -17,7 +16,7 @@ interface ISmallBoxProps {
 const SmallBox = ({title, type, onClick}: ISmallBoxProps) => {
     return (
         <Box onClick={onClick}  className="file" sx={{ border: 1, padding: "10px", display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <Stack>
+            <Stack alignItems="center" justifyContent="center" sx={{height: "100%", width: "100%", }}>
                 {type === "file" &&
                 <img className='image' src={file} />
                 }
