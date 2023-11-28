@@ -57,6 +57,7 @@ const FileView = ({user_uuid}: IFileviewProps) => {
     };
 
     function transformStringToYQL(inputString: string): string {
+        // var words = inputString.replace(/\s/g, '","');
         return `select * from articles where default contains phrase("${inputString}") or directory contains phrase("${inputString}")`;
     }
 
@@ -101,6 +102,7 @@ const FileView = ({user_uuid}: IFileviewProps) => {
             } else {
                 setArticles([]);
             }
+            setFolders([])
 
             } else {
             throw new Error(`Query failed with status code ${response.status}: ${await response.text()}`);

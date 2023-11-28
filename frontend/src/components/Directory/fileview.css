@@ -6,6 +6,39 @@
     border-radius: 12px;
 }
 
+/* Rectangle 36 */
+.rectangle36 {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 89px;
+    top: 586px;
+    
+    background: #B2E29C;
+    border-radius: 2.8125px;
+}
+
+/* image 10 (Traced) */
+.image10Traced {
+    position: absolute;
+    left: 5.48%;
+    right: 93.43%;
+    top: 53.08%;
+    bottom: 45.47%;
+
+    background: #FFFFFF;
+
+}
+
+
+.fileview2{
+    background: "#FFFFFF";
+    box-shadow: 0px 0px 4px 0px #00000040 inset;
+    width: 90%;
+    height: 80vh;
+    border-radius: 12px;
+}
+
 .search{
     border-radius: 50px;
 }
