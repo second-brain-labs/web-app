@@ -123,8 +123,7 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
         .first()
     )
     if existing_directory:
-        return existing_directory
-
+       return existing_directory
     if directory.name == "/":
         directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid)
     else:

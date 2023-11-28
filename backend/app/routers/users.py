@@ -1,5 +1,5 @@
 from app.db import get_db
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from app.models import UserModel, DirectoryModel
 from app.schemas.users import UserSchema, UserCreateSchema
 
@@ -9,7 +9,8 @@ router = APIRouter(prefix="/users")
 @router.get("/me/{user_uuid}", response_model=UserSchema)
 async def get_user(user_uuid: str, db=Depends(get_db)):
     user: UserModel = db.query(UserModel).filter(UserModel.uuid == user_uuid).first()
-
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     return user
 
 

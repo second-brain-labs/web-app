@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton, Modal, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Modal, Stack, Typography } from '@mui/material';
 import React from 'react';
 
 
@@ -29,17 +29,18 @@ const Popup = ({handleClose, x, open, title, summary}: ModalProps) => {
                             background: "#FFFFFF",
                             boxShadow: "0px 0px 4.030760288238525px 0px #00000040",
                             padding: "10px",
+                            overflowY: "auto",
+                            overflowX: "hidden",
                             }}>
                         <Stack>
                             <Stack direction="row" justifyContent="center"
   alignItems="center">
-                                <img></img>
                                 <Typography>{title}</Typography>
                                 <IconButton>
 
                                 </IconButton>
                             </Stack>
-                            <Typography>{summary}</Typography>
+                            <Typography sx={{wordWrap: "break-word"}}>{summary}</Typography>
                             <Stack direction="row"></Stack>
                         </Stack>
                     </Box>

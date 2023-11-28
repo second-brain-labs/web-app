@@ -1,67 +1,64 @@
-import React, { useEffect, useState } from 'react';
-import ArticleCard from '../../components/Article/ArticleCard';
-import '../../styles/homepage.css';
-import { Box, Button, Grid, Modal, Stack, Typography } from '@mui/material';
-import ArticleView from '../ArticlePage/ArticleView';
+import React from 'react';
+import '../../util/styles/homepage.css';
+import { Button, Stack, Typography } from '@mui/material';
 import Logo from '../../components/Shared/Logo';
 import DropDown from '../../components/Shared/DropDown';
 import FileView from '../../components/Directory/FileView';
 import Chat from '../../components/Chat/Chat';
-import { IconButton } from '@mui/material';
-import CreateIcon from '@mui/icons-material/Create';
+import { useUser } from '../../util/redux/hooks/useUser';
+import { useAuth } from '../../util/redux/hooks/useAuth';
+import { useSearchParams } from 'react-router-dom';
 
 
 const HomePage = () => {
 
-    const [isOpen, setIsOpen] = useState(false);
-    const [currentArticle, setCurrentArticle] = useState(1);
+    
+    const {userID, username, userLogout} = useUser();
+    const {logout} = useAuth();
 
-    const handleOpen = () => {
-        setIsOpen(true);
-        setCurrentArticle(1);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const handleLogout = () => {
+        logout();
+        userLogout();
     }
 
-    const handleClose = () => {
-        setIsOpen(false);
-    }
-
-    useEffect(() => {
-
-    }, []);
 
     return (
         <Stack direction={"row"}
-        sx={{width: "100%", height: "100%", margin: "10px"}}
+            sx={{ width: "100%", height: "100%", margin: "10px" }}
         >
-            <Stack sx={{width: "30%", height: "100%"}}>
-                <Logo/>
-                <DropDown/>
-                <DropDown/>
-                <Chat/>
+            <Stack sx={{ width: "30%", height: "100%" }}>
+                <Logo />
+                <DropDown />
+                <DropDown />
+                <Chat />
             </Stack>
 
-            <Stack sx={{width: "100%", height: "100%"}}>
+            <Stack sx={{ width: "90%", height: "100%" }}>
                 <Stack
-                direction={"row"}
-                justifyContent={"space-between"}
+                    sx={{ width: "90%", height: "100%" }}
+                    direction={"row"}
+                    justifyContent={"space-between"}
                 >
                     <Stack
                         direction={"row"}
-                        sx={{width: "100%", height: "100%"}}
-                        >
-                        <Typography>Space Title</Typography>
-                        <IconButton>
-                            <CreateIcon/>
-                        </IconButton>
+                        sx={{ width: "100%", height: "100%" }}
+                    >
+                        <Typography>{searchParams.get("path")}</Typography>
                     </Stack>
                     <Stack
                         direction={"row"}
-                        >
-                        <Typography>Rohan Gupta</Typography>
+                    >
+                        <Typography>{username}</Typography>
                     </Stack>
                 </Stack>
-                <FileView/>
+                <FileView user_uuid={userID!}/>
             </Stack>
+            <Stack>
+                <Button onClick={handleLogout} variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Logout</Button>
+            </Stack>
+            
 
         </Stack>
     );
