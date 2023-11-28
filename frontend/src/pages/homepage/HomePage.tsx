@@ -50,9 +50,10 @@ const HomePage = () => {
                 >
                     <Stack
                         direction={"row"}
-                        sx={{ width: "100%", height: "100%",  }}
+                        alignItems="center"
+                        sx={{ width: "100%", height: "100%", marginTop: "5px", marginBottom: "15px" }}
                     >
-                        <Typography>{searchParams.get("path")}</Typography>
+                        <Typography style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', marginLeft: "20px", fontSize: "20px"}} >{searchParams.get("path") != null ? "Space 1 > " + searchParams.get("path")?.replace(/\//g, " > ") : "Space 1"}</Typography>
                     </Stack>
                     <Stack
                         direction={"row"}

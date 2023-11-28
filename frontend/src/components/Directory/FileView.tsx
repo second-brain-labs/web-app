@@ -34,11 +34,21 @@ const FileView = ({user_uuid}: IFileviewProps) => {
     const [folders, setFolders] = useState<IFolder[]>([]);
     const [searchValue, setSearchValue] = useState('');
 
+    function make_title_readable(title: string): string {
+        let re = /%../g;
+        return title.replace(re, " ");
+    }
+
     const fetchArticlesFolders = async () => {
         try {
           const response = await axios.get(`http://localhost:3500/articles/directory/all?name=${path}&user_uuid=${user_uuid}`);
           const data = (await response).data
           console.log(data)
+          
+          data.articles.forEach(function (article: any) {
+            article.title = make_title_readable(article.title);
+          });
+
           setArticles(data.articles);
           setFolders(data.subdirectories);
         } catch (err) {
@@ -52,7 +62,7 @@ const FileView = ({user_uuid}: IFileviewProps) => {
 
     const handleSearch = async () => {
         // Constructing the Vespa YQL query URL
-        const vespaUrl = 'http://localhost:8080';
+        const vespaUrl = 'http://localhost:4545';
         const queryUrl = `${vespaUrl}/search/`;
 
         // Parameters for the query
@@ -60,30 +70,30 @@ const FileView = ({user_uuid}: IFileviewProps) => {
             yql: transformStringToYQL(searchValue),
             format: 'json',
         });
-        console.log(params)
         try {
             // Sending the GET request to Vespa
+            console.log("query string: ", `${queryUrl}?${params.toString()}`)
             const response = await fetch(`${queryUrl}?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': 'http://localhost:3000'
             },
             });
 
             // Check if the request was successful
+            console.log("response: ", response)
             if (response.ok) {
             const jsonResponse = await response.json();
             // return jsonResponse
             console.log(jsonResponse)
-            if (jsonResponse.root.fiels.totalCount > 0) {
+            if (jsonResponse.root.fields.totalCount > 0) {
                 const transformedArticles: IFile[] = jsonResponse.root.children.map((x: any) => {
                     return {
                         directory: x.fields.directory,
                         id: x.fields.id,
                         summary: x.fields.summary,
                         time_created: x.fields.time_created,
-                        title: x.fields.title,
+                        title: make_title_readable(x.fields.title),
                         user_id: x.fields.user_uuid,
                     }
                 })
@@ -134,6 +144,7 @@ const FileView = ({user_uuid}: IFileviewProps) => {
                 marginTop: "16px", // Adjust the value as needed for the desired space
                 marginBottom: "16px", // Adjust the value as needed for the desired space
                 display: 'flex', justifyContent: 'center',
+                borderRadius: "20px",
                 
             }}>
                 <TextField   
@@ -141,7 +152,7 @@ const FileView = ({user_uuid}: IFileviewProps) => {
                     placeholder='Type to run a search (e.g. articles about collagen from between 2018 and 2020)' 
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
-                    sx={{  width: "90%", background: '#FFFFFF' }}
+                    sx={{  width: "90%", background: '#FFFFFF', borderRadius: "9px" }}
                 />
             </Box>
 

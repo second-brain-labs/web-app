@@ -37,7 +37,7 @@ const SmallBox = ({title, type, onClick}: ISmallBoxProps) => {
                     WebkitBoxOrient: 'vertical',
                     textAlign: 'center'
                 }}>
-                    {(title.length > 15) ? (title.substring(0, 14)) : title}
+                    {(title.length > 15) ? (title.substring(0, 14)) + "..." : title}
                 </Typography>
             </Stack>
         </Box>  
