@@ -15,10 +15,12 @@ import { useSearchParams } from 'react-router-dom';
 
 interface IFileviewProps{
     user_uuid: string,
+    topic: string, 
+    setTopic: (topic: string) => void;
   }
   
 
-const FileView = ({user_uuid}: IFileviewProps) => {
+const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const path = (searchParams.get('path') === null) ? "/": searchParams.get('path');
@@ -61,14 +63,14 @@ const FileView = ({user_uuid}: IFileviewProps) => {
         return `select * from articles where default contains phrase("${inputString}") or directory contains phrase("${inputString}")`;
     }
 
-    const handleSearch = async () => {
+    const handleSearch = async (searchString: string) => {
         // Constructing the Vespa YQL query URL
         const vespaUrl = 'http://localhost:4545';
         const queryUrl = `${vespaUrl}/search/`;
 
         // Parameters for the query
         const params = new URLSearchParams({
-            yql: transformStringToYQL(searchValue),
+            yql: transformStringToYQL(searchString),
             format: 'json',
         });
         try {
@@ -115,10 +117,15 @@ const FileView = ({user_uuid}: IFileviewProps) => {
 
     useEffect(() => {
         fetchArticlesFolders();
-        if (searchValue) { // Prevent running on initial render with empty string
-            handleSearch();
-          }
-    }, [path, create, searchValue]);
+        if (topic) {
+            handleSearch(topic)
+        }
+        if (searchValue) {
+            setTopic('')
+            handleSearch(searchValue)
+        }
+        
+    }, [path, create, searchValue, topic]);
 
     const [open, setOpen] = useState("-1");
 

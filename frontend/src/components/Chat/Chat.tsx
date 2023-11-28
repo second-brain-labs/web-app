@@ -1,17 +1,24 @@
-import React, {useState} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { Paper, InputBase, IconButton, Typography, Stack, Divider } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import traced from '../../assets/images/traced_brain.svg';
 import rectangle from '../../assets/images/Rectangle36.svg';
 import orangeRectangle from '../../assets/images/Rectangle38.svg';
 import { useUser } from '../../util/redux/hooks/useUser';
+import { current } from '@reduxjs/toolkit';
 
+interface ChatProps {
+    topic: string;
+    setTopic: (topic: string) => void;
+    
+}
 
-const Chat = () => {
+const Chat: React.FC<ChatProps> = ({topic, setTopic }) => {
 
   const {userID, username, userLogout} = useUser();
   const [messages, setMessages] = useState(['This is Second Brain! Ask me a question about any of your spaces in the box below!', "I have a question?", "I have an answer!"]);
   const [currentMessage, setCurrentMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   function getInitials(): string {
     if (username === null) return '';
@@ -21,18 +28,40 @@ const Chat = () => {
       .join(''); // Join all the first letters together
   }
   
-  const handleEnter = () => {
+  const handleEnter = async () => {
     // Custom logic for handleEnter
-    
+    const response = await fetch(`http://localhost:3500/chat/topic/${currentMessage}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        });
+
+        // Check if the request was successful
+        console.log("response: ", response)
+        if (response.ok) {
+            const jsonResponse = await response.json();
+            console.log(jsonResponse)
+            setTopic(jsonResponse)
+            console.log("topic: ", topic)
+            const new_message = `Great! I've displayed all articles related to ${jsonResponse}`
+            setMessages([...messages, currentMessage,  new_message]);
+        } else {
+            throw new Error(`Query failed with status code ${response.status}: ${await response.text()}`);
+        }
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!currentMessage.trim()) return; // Ignore empty messages
-    setMessages([...messages, currentMessage]);
-    setCurrentMessage('');
+    // setMessages([...messages, currentMessage]);
     handleEnter();
+    setCurrentMessage('');
   };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
 
   return (
@@ -95,7 +124,7 @@ const Chat = () => {
             // </Stack>
             // </Stack>
           ))}
-
+        <div ref={messagesEndRef} />
       {/* <Box sx={{ flex: 1 }}>
         <Typography variant="caption" display="block" gutterBottom>
         This is Second Brain! Ask me a question about any of your spaces in the box below!

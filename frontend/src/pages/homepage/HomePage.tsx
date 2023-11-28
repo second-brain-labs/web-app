@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../../util/styles/homepage.css';
 import { Button, Stack, Typography, Box } from '@mui/material';
 import Logo from '../../components/Shared/Logo';
@@ -18,6 +18,7 @@ const HomePage = () => {
     const {logout} = useAuth();
 
     const [searchParams, setSearchParams] = useSearchParams();
+    const [topic, setTopic] = useState('');
 
     const handleLogout = () => {
         logout();
@@ -38,7 +39,7 @@ const HomePage = () => {
                     <DropDown title="Previous Chats" spaces={["October 1, 2023: 7:50 PM", "September 19, 2023: 6:57 AM"]} />
                 </Box>
                 <Box sx={{ width: '100%', mt: 'auto' }}> {/* This will push the Chat component to the bottom */}
-                    <Chat />
+                    <Chat topic={topic} setTopic={setTopic}/>
                 </Box>
             </Stack>
 
@@ -66,7 +67,7 @@ const HomePage = () => {
                         <Button onClick={handleLogout} variant="contained" sx={{borderRadius: "12px", marginRight: "25px", background: '#8EC2FF'}}>Logout</Button>
                     </Stack>
                 </Stack>
-                <FileView user_uuid={userID!}/>
+                <FileView user_uuid={userID!} topic={topic} setTopic={setTopic}/>
             </Stack>
         </Stack>
     );
