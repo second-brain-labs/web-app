@@ -123,7 +123,7 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
         .first()
     )
     if existing_directory:
-       return existing_directory
+        return existing_directory
     if directory.name == "/":
         directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid)
     else:
@@ -261,3 +261,47 @@ async def upload_article(
     )
 
     return article
+
+
+@router.delete("/article/{article_id}")
+async def delete_article(article_id: int, db=Depends(get_db)):
+    article: ArticleModel = (
+        db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+    )
+    if article is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+        )
+    db.delete(article)
+    db.commit()
+    return {"msg": "Article deleted successfully!"}
+
+
+@router.delete("/directory/{user_uuid}/{directory_name}")
+async def delete_directory(user_uuid: str, directory_name: str, db=Depends(get_db)):
+    if directory_name == "/":
+        return {"msg": "Cannot delete root directory!"}
+    articles = (
+        db.query(ArticleModel)
+        .filter(
+            ArticleModel.directory.startswith(directory_name),
+            ArticleModel.user_uuid == user_uuid,
+        )
+        .all()
+    )
+    for article in articles:
+        db.delete(article)
+    db.commit()
+
+    directories = (
+        db.query(DirectoryModel)
+        .filter(
+            DirectoryModel.name.startswith(directory_name),
+            DirectoryModel.user_uuid == user_uuid,
+        )
+        .all()
+    )
+    for directory in directories:
+        db.delete(directory)
+    db.commit()
+    return {"msg": "Directory deleted successfully!"}
