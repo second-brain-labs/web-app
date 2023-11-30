@@ -6,6 +6,7 @@ import rectangle from '../../assets/images/Rectangle36.svg';
 import orangeRectangle from '../../assets/images/Rectangle38.svg';
 import { useUser } from '../../util/redux/hooks/useUser';
 import { current } from '@reduxjs/toolkit';
+import './../Directory/image.css';
 
 interface ChatProps {
     topic: string;
