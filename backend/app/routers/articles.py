@@ -201,7 +201,6 @@ def transform_json_input(input_json):
     directory = input_json.directory
     uuid = input_json.user_uuid
     summary = input_json.summary
-    article_id = input_json.id
     time_created = str(input_json.time_created)
     url = input_json.url
 
@@ -267,7 +266,6 @@ async def create_article(
     )
 
     new_json = transform_json_input(article)
-    # Feed the document to Vespa
     document_id = f"{article.id}"
     feed_document_to_vespa(new_json, document_id)
 
