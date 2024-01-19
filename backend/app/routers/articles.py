@@ -15,6 +15,12 @@ from app.schemas.articles import (
 import PyPDF2
 import random
 from transformers import AutoTokenizer, AutoModelWithLMHead
+from pydantic import BaseModel, ConfigDict
+
+class FooBar(BaseModel):
+    model_config = ConfigDict(coerce_numbers_to_str=True)
+
+    whatever: str
 
 router = APIRouter(prefix="/articles")
 

@@ -3,6 +3,7 @@ import '../../util/styles/homepage.css';
 import { Button, Stack, Typography } from '@mui/material';
 import Logo from '../../components/Shared/Logo';
 import DropDown from '../../components/Shared/DropDown';
+import PdfUpload from '../../components/Shared/PdfUpload';
 import FileView from '../../components/Directory/FileView';
 import Chat from '../../components/Chat/Chat';
 import { useUser } from '../../util/redux/hooks/useUser';
@@ -12,7 +13,7 @@ import { useSearchParams } from 'react-router-dom';
 
 const HomePage = () => {
 
-    
+
     const {userID, username, userLogout} = useUser();
     const {logout} = useAuth();
 
@@ -30,7 +31,7 @@ const HomePage = () => {
         >
             <Stack sx={{ width: "30%", height: "100%" }}>
                 <Logo />
-                <DropDown />
+                <PdfUpload user_uuid={userID!}/>
                 <DropDown />
                 <Chat />
             </Stack>
@@ -58,7 +59,7 @@ const HomePage = () => {
             <Stack>
                 <Button onClick={handleLogout} variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Logout</Button>
             </Stack>
-            
+
 
         </Stack>
     );
