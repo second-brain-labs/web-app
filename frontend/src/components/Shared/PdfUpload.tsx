@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useRef } from "react";
 import { Stack, Typography } from "@mui/material";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
@@ -12,6 +12,10 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const path =
     searchParams.get("path") === null ? "/" : searchParams.get("path");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const uploadArticle = async () => {
     try {
@@ -60,7 +64,7 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
     setSelectedFile(file || null);
     if (selectedFile) {
       console.log("WAY TO GO YOU MADE IT HERE");
-      uploadArticle();
+      //   uploadArticle();
     } else {
       console.log("shit fuck");
     }
@@ -71,17 +75,28 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
       <input
         type="file"
         onChange={handleFileChange}
+        ref={fileInputRef}
         accept=".pdf"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          opacity: 0,
-        }}
+        style={{ display: "none" }}
       />
-      <button>Upload PDF</button>
+      <Stack>
+        {selectedFile != null && (
+          <p style={{ fontSize: "11px", margin: "4px 0" }}>
+            {selectedFile?.name}
+          </p>
+        )}
+        <button
+          onClick={handleFileButtonClick}
+          style={{ width: "fit-content" }}
+        >
+          Select PDF
+        </button>
+        {selectedFile != null && (
+          <button onClick={uploadArticle} style={{ width: "fit-content" }}>
+            Upload PDF
+          </button>
+        )}
+      </Stack>
     </div>
   );
 };
