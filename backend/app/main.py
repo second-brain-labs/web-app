@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from app import models
 from app.db import engine
-from app.routers import users, articles
+from app.routers import users, articles, external
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -16,6 +16,7 @@ api = FastAPI()
 
 api.include_router(users.router)
 api.include_router(articles.router)
+api.include_router(external.router)
 
 origins = [
     "http://localhost:3000",

@@ -1,27 +1,43 @@
 import React, {useState} from 'react';
-import { Stack, Typography } from '@mui/material';
+import { Stack, Typography, Box } from '@mui/material';
+
+interface DropDownProps {
+    title: string,
+    spaces: string[],
+}
 
 
 
-const DropDown = () => {
+const DropDown = (props:DropDownProps) => {
 
     const [open, setOpen] = useState(false);
     return (<>
         {!open &&
-        <Stack onClick={()=>setOpen(true)}>
-            <Typography>My Spaces</Typography>
-        </Stack>
+        <Box onClick={()=>setOpen(true)} sx={{ color: '#A1C88E', display: 'flex', alignItems: 'center' }}>
+            <span>▶</span> {/* This is a right-pointing triangle (arrow) */}
+            <Typography variant="body1" sx={{ marginLeft: '8px' }}>
+                {props.title}
+            </Typography>
+        </Box>
         }
         {open &&
             <>
-            <Stack onClick={()=>setOpen(false)}>
-                <Typography>My Spaces</Typography>
-            </Stack>
-            <li>
-                <ul>Space 1</ul>
-                <ul>Space 2</ul>
-            </li>
-
+            <Box onClick={()=>setOpen(false)} sx={{ color: '#A1C88E', display: 'flex', alignItems: 'center' }}>
+                <span>▼</span> {/* This is a right-pointing triangle (arrow) */}
+                <Typography variant="body1" sx={{ marginLeft: '8px' }}>
+                    {props.title}
+                </Typography>
+            </Box>
+            <Box component="ul" sx={{ 
+                color: '#A1C88E', 
+                listStyleType: 'disc', /* This creates the bullet points */
+                padding: 0, /* Removes default padding */
+                marginLeft: '40px', /* Adjust as needed for indentation */
+            }}>
+                {props.spaces.map((space, index) => {
+                    return <li key={index}>{space}</li>
+                })}
+            </Box>
             </>
         }
         </>
