@@ -310,6 +310,9 @@ async def upload_article(
     article = handle_article(
         db, article.title, article.user_uuid, article.directory, article_content
     )
+    new_json = transform_json_input(article)
+    document_id = f"{article.id}"
+    feed_document_to_vespa(new_json, document_id)
 
     return article
 
