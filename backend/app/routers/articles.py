@@ -15,12 +15,8 @@ from app.schemas.articles import (
 import PyPDF2
 import random
 from transformers import AutoTokenizer, AutoModelWithLMHead
-from pydantic import BaseModel, ConfigDict
-
-class FooBar(BaseModel):
-    model_config = ConfigDict(coerce_numbers_to_str=True)
-
-    whatever: str
+import requests
+import json
 
 router = APIRouter(prefix="/articles")
 
@@ -200,6 +196,50 @@ def handle_article(db, title, user_uuid, directory, content, url=None):
     return article
 
 
+def transform_json_input(input_json):
+    # Extract values from input JSON
+    title = input_json.title
+    directory = input_json.directory
+    uuid = input_json.user_uuid
+    summary = input_json.summary
+    time_created = str(input_json.time_created)
+    url = input_json.url
+
+    # Construct the new JSON format
+    transformed_json = {
+        "fields": {
+            "title": title,
+            "content": summary,  # Assuming you want to use 'summary' as 'content'
+            "abstract": summary,  # Assuming 'summary' also goes into 'abstract'
+            "url": url,  # Example URL, adjust as needed
+            "directory": directory,
+            "time_created": time_created,
+            "uuid": uuid,
+        }
+    }
+
+    return transformed_json
+
+
+def feed_document_to_vespa(document, document_id, vespa_url="http://localhost:4545"):
+    # Constructing the document API URL
+    feed_url = f"{vespa_url}/document/v1/articles/articles/docid/{document_id}"
+
+    # Headers for the request
+    headers = {"Content-Type": "application/json"}
+
+    # Sending the POST request to Vespa
+    response = requests.post(feed_url, headers=headers, data=json.dumps(document))
+
+    # Check if the request was successful
+    if response.status_code in [200, 201]:
+        return response.json()
+    else:
+        raise Exception(
+            f"Feeding failed with status code {response.status_code}: {response.text}"
+        )
+
+
 @router.post("/article/create", response_model=ArticleContentSchema)
 async def create_article(
     article: ArticleCreateHTMLSchema,
@@ -227,6 +267,11 @@ async def create_article(
         article.content,
         article.url,
     )
+
+    new_json = transform_json_input(article)
+    document_id = f"{article.id}"
+    feed_document_to_vespa(new_json, document_id)
+
     return article
 
 

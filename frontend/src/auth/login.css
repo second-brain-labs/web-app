@@ -1,26 +1,34 @@
 .loginScreen {
-    display: flex;
-    justify-content: space-between;
-    height: 100vh;
-    width: "100vh";
-  }
-  
-  .formSection {
-    flex: 1;
-    margin-right: 16px;
-  }
-  
-  .statsSection {
-    flex: 1;
-    margin-left: 16px;
-    background-color: #d2ecd5;
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .footer {
-    margin-top: auto; /* Push the footer to the bottom of the stats section */
-  }
-  
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch; /* Added to align children vertically */
+  height: 100vh;
+  width: 100%; /* Changed from "100vh" to "100%" */
+}
+
+.formSection {
+  flex: 1;
+  margin-right: 16px;
+  display: flex;
+  flex-direction: column; /* Added to manage internal layout */
+  justify-content: center; /* Added for vertical centering */
+}
+
+.statsSection {
+  flex: 1;
+  margin-left: 16px;
+  background-color: #d2ecd5;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%; /* Added to ensure it takes full height */
+}
+
+.footer {
+  margin-top: auto;
+}
+
+.linkSpacing {
+  margin-top: 16px; /* Adjust as needed */
+}
