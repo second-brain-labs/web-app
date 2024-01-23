@@ -14,38 +14,19 @@ import PdfUpload from '../Shared/PdfUpload';
 
 
 
-<<<<<<< HEAD
-
-
 interface IFileviewProps {
-    user_uuid: string,
-}
-
-
-const FileView = ({ user_uuid }: IFileviewProps) => {
-
-    const [searchParams, setSearchParams] = useSearchParams();
-    const path = (searchParams.get('path') === null) ? "/" : searchParams.get('path');
-
-
-
-
-    useEffect(() => {
-=======
-interface IFileviewProps{
     user_uuid: string,
     topic: string,
     setTopic: (topic: string) => void;
-  }
+}
 
 
 const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const path = (searchParams.get('path') === null) ? "/": searchParams.get('path');
+    const path = (searchParams.get('path') === null) ? "/" : searchParams.get('path');
 
-    useEffect(()=> {
->>>>>>> main
+    useEffect(() => {
         console.log(path);
     }, []);
 
@@ -191,15 +172,16 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
                     variant="contained"
                     sx={{ borderRadius: "12px", marginRight: "10px", background: "#8EC2FF" }}
                 >
-                    Add to this space
+                    Add folder to this space
                 </Button>
                 <Button
                     variant="contained"
                     color="success"
-                    sx={{ borderRadius: "12px", background: "#A1C88E" }}
+                    sx={{ borderRadius: "12px", marginRight: "10px", background: "#A1C88E" }}
                 >
                     Smart categorize my view
                 </Button>
+                <PdfUpload user_uuid={user_uuid} />
             </Stack>
 
 
@@ -222,19 +204,20 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
                             <SpaceBox title="bro" type="folder" />
                         </>
                     }
+                </>
                 )}
-                    {folders.map((x) => <>
-                        {true &&
-                            <>
-                                <SmallBox onClick={() => handleFolderClick(x.name)} title={x.name} type={"folder"} />
-                            </>
-                        }
-                    </>
-                    )}
-                    <CreateFolderModal path={path} setCreate={setCreate} created={create} open={createModalOpen} handleClose={handleClose} userId={user_uuid} />
+                {folders.map((x) => <>
+                    {true &&
+                        <>
+                            <SmallBox onClick={() => handleFolderClick(x.name)} title={x.name} type={"folder"} />
+                        </>
+                    }
+                </>
+                )}
+                <CreateFolderModal path={path} setCreate={setCreate} created={create} open={createModalOpen} handleClose={handleClose} userId={user_uuid} />
 
 
-                </Grid >
+            </Grid>
         </Stack>
 
     );
