@@ -10,9 +10,12 @@ class UserModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # once we move to postgres, we can use the Uuid datatype instead of string.
     uuid = Column(
-        String, unique=True, index=True, default=lambda x: str(uuid_pkg.uuid4())
+        String,
+        unique=True,
+        index=True,
+        nullable=False,
+        default=lambda x: str(uuid_pkg.uuid4()),
     )
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
@@ -28,16 +31,18 @@ class ArticleModel(Base):
     content = Column(String)
     summary = Column(String)
     url = Column(String)
-    directory = Column(String, ForeignKey("directories.name"))
     time_created = Column(DateTime(timezone=True), server_default=func.now())
-    user_uuid = Column(Integer, ForeignKey("users.uuid"), index=True)
+    user_uuid = Column(String, ForeignKey("users.uuid"), index=True)
     user = relationship("UserModel", back_populates="articles")
+    directory = Column(
+        Integer, ForeignKey("directories.id", ondelete="CASCADE"), index=True
+    )
 
 
 class DirectoryModel(Base):
     __tablename__ = "directories"
-
-    name = Column(String, nullable=False, primary_key=True)
-    user_uuid = Column(Integer, ForeignKey("users.uuid"), primary_key=True)
-    parent_directory = Column(String, ForeignKey("directories.name"))
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    user_uuid = Column(String, ForeignKey("users.uuid"))
+    parent_directory = Column(Integer, ForeignKey("directories.id"))
     user = relationship("UserModel", back_populates="directories")

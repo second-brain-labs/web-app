@@ -1,10 +1,11 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 import uvicorn
 import os
 from dotenv import load_dotenv
 from app import models
 from app.db import engine
-from app.routers import users, articles
+from app.routers import users, articles, directories
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -16,6 +17,7 @@ api = FastAPI()
 
 api.include_router(users.router)
 api.include_router(articles.router)
+api.include_router(directories.router)
 
 origins = [
     "http://localhost:3000",
@@ -32,7 +34,7 @@ api.add_middleware(
 
 @api.get("/")
 async def root():
-    return {"msg": "API is Online!"}
+    return RedirectResponse("/docs")
 
 
 if __name__ == "__main__":
