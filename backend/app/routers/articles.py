@@ -195,6 +195,7 @@ def handle_article(db, title, user_uuid, directory, content, url=None):
 
     return article
 
+
 def transform_json_input(input_json):
     # Extract values from input JSON
     title = input_json.title
@@ -213,20 +214,19 @@ def transform_json_input(input_json):
             "url": url,  # Example URL, adjust as needed
             "directory": directory,
             "time_created": time_created,
-            "uuid": uuid
+            "uuid": uuid,
         }
     }
 
     return transformed_json
 
-def feed_document_to_vespa(document, document_id, vespa_url='http://localhost:4545'):
+
+def feed_document_to_vespa(document, document_id, vespa_url="http://localhost:4545"):
     # Constructing the document API URL
     feed_url = f"{vespa_url}/document/v1/articles/articles/docid/{document_id}"
 
     # Headers for the request
-    headers = {
-        'Content-Type': 'application/json'
-    }
+    headers = {"Content-Type": "application/json"}
 
     # Sending the POST request to Vespa
     response = requests.post(feed_url, headers=headers, data=json.dumps(document))
@@ -235,7 +235,10 @@ def feed_document_to_vespa(document, document_id, vespa_url='http://localhost:45
     if response.status_code in [200, 201]:
         return response.json()
     else:
-        raise Exception(f"Feeding failed with status code {response.status_code}: {response.text}")
+        raise Exception(
+            f"Feeding failed with status code {response.status_code}: {response.text}"
+        )
+
 
 @router.post("/article/create", response_model=ArticleContentSchema)
 async def create_article(
