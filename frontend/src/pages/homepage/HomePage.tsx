@@ -14,8 +14,8 @@ import { useSearchParams } from 'react-router-dom';
 const HomePage = () => {
 
 
-    const {userID, username, userLogout} = useUser();
-    const {logout} = useAuth();
+    const { userID, username, userLogout } = useUser();
+    const { logout } = useAuth();
 
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -31,7 +31,6 @@ const HomePage = () => {
         >
             <Stack sx={{ width: "30%", height: "100%" }}>
                 <Logo />
-                <PdfUpload user_uuid={userID!}/>
                 <DropDown />
                 <Chat />
             </Stack>
@@ -54,10 +53,10 @@ const HomePage = () => {
                         <Typography>{username}</Typography>
                     </Stack>
                 </Stack>
-                <FileView user_uuid={userID!}/>
+                <FileView user_uuid={userID!} />
             </Stack>
             <Stack>
-                <Button onClick={handleLogout} variant="contained" sx={{borderRadius: "12px", marginRight: "10px"}}>Logout</Button>
+                <Button onClick={handleLogout} variant="contained" sx={{ borderRadius: "12px", marginRight: "10px" }}>Logout</Button>
             </Stack>
 
 
