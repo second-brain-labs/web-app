@@ -75,7 +75,7 @@ function LoginPage() {
             <Paper elevation={3} style={{ padding: '2rem' }}>
                 <GoogleLogin onSuccess={decode_jwt} onError={console.log} />
             </Paper>
-              <Typography variant="body2">
+              <Typography variant="body2" className="linkSpacing" style={{ padding: '1rem' }}>
                 <Link href="#" underline="hover">
                   Forgot your password?
                 </Link>

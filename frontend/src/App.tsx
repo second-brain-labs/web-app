@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import HomePage from './pages/HomePage/HomePage';
+import HomePage from './pages/homepage/HomePage';
 import Footer from './components/Shared/Footer';
 import LoginPage from './auth/LoginPage';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -14,14 +14,14 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route 
-            path="/home" 
+          <Route
+            path="/home"
             element={
               <PrivateRoute>
                 <HomePage />
                 <Footer />
               </PrivateRoute>
-            } 
+            }
           />
         </Routes>
       </BrowserRouter>

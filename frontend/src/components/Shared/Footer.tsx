@@ -11,11 +11,11 @@ const Footer = () => {
         className='footer'
         alignContent={"center"}
         justifyContent={"center"}>
-            <Link href="#" color="inherit" sx={{color: "white"}}>
+            <Link href="#" color="inherit" sx={{color: "white", marginRight: "5px"}}>
                 {"Terms of Use"}
             </Link>
             <Typography sx={{color: "white"}}> | </Typography>
-            <Link href="#" color="inherit" sx={{color: "white"}}>
+            <Link href="#" color="inherit" sx={{color: "white", marginLeft: "5px"}}>
                 {"Privacy Policy"}
             </Link>
             
