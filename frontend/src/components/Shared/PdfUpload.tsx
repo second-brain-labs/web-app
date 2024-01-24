@@ -40,9 +40,12 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
 
         // Convert the string to a Blob
         var blob = new Blob([fileObject]);
-
+        const directory = axios.get(
+          `http://localhost:3500/directories/query?name=${path}&user_uuid=${user_uuid}`
+        );
+        const directoryData = (await directory).data;
         const response = axios.post(
-          `http://localhost:3500/articles/article/upload?title=${fileObject?.name}&user_uuid=${user_uuid}&directory=${path}`,
+          `http://localhost:3500/articles/article/upload?title=${fileObject?.name}&user_uuid=${user_uuid}&directory=${directoryData.id}`,
           formData
           //   {
           //     headers: {
@@ -74,8 +77,8 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
         style={{ display: 'none' }}
         onChange={(e) => uploadArticle(e.target.files ? e.target.files[0] : null)}
       />
-      <Button variant="contained" color="secondary" onClick={handleButtonClick} sx={{ borderRadius: "12px" }}>
-        Upload File
+      <Button variant="contained" onClick={handleButtonClick} sx={{ borderRadius: "12px", backgroundColor: "#ffd556" }}>
+        Upload PDF
       </Button>
     </>
   );

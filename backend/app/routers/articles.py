@@ -163,6 +163,7 @@ def transform_json_input(input_json):
 
 
 def feed_document_to_vespa(document, document_id, vespa_url="http://localhost:4545"):
+    return
     # Constructing the document API URL
     feed_url = f"{vespa_url}/document/v1/articles/articles/docid/{document_id}"
 
