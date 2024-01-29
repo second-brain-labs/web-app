@@ -6,14 +6,15 @@ import os
 
 load_dotenv()
 
-POSTGRES_HOST = os.getenv("POSTGRES_HOST")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT")
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASS")
-
-# SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+if os.getenv("APP_ENV").lower() == "production":
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST_PROD")
+    POSTGRES_PORT = os.getenv("POSTGRES_PORT_PROD")
+    POSTGRES_USER = os.getenv("POSTGRES_USER_PROD")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASS_PROD")
+    SQLALCHEMY_DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/postgres"
+else:
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-SQLALCHEMY_DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/postgres"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

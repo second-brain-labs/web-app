@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 import uvicorn
-import os
 from dotenv import load_dotenv
 from app import models
 from app.db import engine
@@ -39,7 +38,4 @@ async def root():
 
 
 if __name__ == "__main__":
-    if os.environ.get("APP_ENV") == "development":
-        uvicorn.run("app.main:api", host="0.0.0.0", port=3500, workers=4, reload=True)
-    else:
-        pass
+    uvicorn.run("app.main:api", host="0.0.0.0", port=3500, workers=4, reload=True)
