@@ -9,7 +9,6 @@ from app.schemas.articles import (
     ArticleContentSchema,
     DirectoryArticlesAndSubdirectoriesSchema,
     DirectoryInfoSchema,
-    DirectoryCreateSchema,
     ArticleCreateHTMLSchema,
 )
 import PyPDF2
@@ -63,96 +62,38 @@ async def get_article_content(article_id: int, db=Depends(get_db)):
 async def get_articles_by_directory(name: str, user_uuid: str, db=Depends(get_db)):
     articles: list[ArticleModel] = (
         db.query(ArticleModel)
-        .filter(ArticleModel.directory == name, ArticleModel.user_uuid == user_uuid)
+        .filter(
+            ArticleModel.directory_name == name, ArticleModel.user_uuid == user_uuid
+        )
         .all()
     )
     return articles
 
 
-@router.get("/directory/subdirectories/", response_model=list[DirectoryInfoSchema])
-async def get_folders(name: str, user_uuid: str, db=Depends(get_db)):
-    directories: list[DirectoryModel] = (
-        db.query(DirectoryModel)
-        .filter(
-            DirectoryModel.parent_directory == name,
-            DirectoryModel.user_uuid == user_uuid,
-        )
-        .all()
-    )
-    return directories
-
-
 @router.get("/directory/all/", response_model=DirectoryArticlesAndSubdirectoriesSchema)
 async def get_articles_and_folders(name: str, user_uuid: str, db=Depends(get_db)):
-    directories: list[DirectoryModel] = (
+    directory = (
+        db.query(DirectoryModel)
+        .filter(DirectoryModel.name == name, DirectoryModel.user_uuid == user_uuid)
+        .first()
+    )
+    if directory is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Directory not found"
+        )
+    subdirs: list[DirectoryModel] = (
         db.query(DirectoryModel)
         .filter(
-            DirectoryModel.parent_directory == name,
-            DirectoryModel.user_uuid == user_uuid,
+            DirectoryModel.parent_directory == directory.id,
         )
         .all()
     )
     articles: list[ArticleModel] = (
-        db.query(ArticleModel)
-        .filter(ArticleModel.directory == name, ArticleModel.user_uuid == user_uuid)
-        .all()
+        db.query(ArticleModel).filter(ArticleModel.directory == directory.id).all()
     )
     return DirectoryArticlesAndSubdirectoriesSchema(
-        articles=articles, subdirectories=directories
+        articles=articles, subdirectories=subdirs
     )
-
-
-def _get_parent_directory(directory: str):
-    tree = directory.split("/")
-    if len(tree) == 1:
-        return "/"
-
-    return "/".join(tree[:-1])
-
-
-@router.post("/directory/create", response_model=DirectoryInfoSchema)
-async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db)):
-    """
-    Create a directory a/b/c/d
-    """
-    # check if directory exists
-    existing_directory: DirectoryModel = (
-        db.query(DirectoryModel)
-        .filter(
-            DirectoryModel.name == directory.name,
-            DirectoryModel.user_uuid == directory.user_uuid,
-        )
-        .first()
-    )
-    if existing_directory:
-        return existing_directory
-    if directory.name == "/":
-        directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid)
-    else:
-        parent_dir = _get_parent_directory(directory.name)
-        parent_directory: DirectoryModel = (
-            db.query(DirectoryModel)
-            .filter(
-                DirectoryModel.name == parent_dir,
-                DirectoryModel.user_uuid == directory.user_uuid,
-            )
-            .first()
-        )
-        if parent_directory is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Parent directory not found",
-            )
-        directory = DirectoryModel(
-            name=directory.name,
-            user_uuid=directory.user_uuid,
-            parent_directory=parent_dir,
-        )
-
-    db.add(directory)
-    db.commit()
-    db.refresh(directory)
-    return directory
 
 
 @router.get("/directory/all-recursive", response_model=list[DirectoryInfoSchema])
@@ -222,6 +163,7 @@ def transform_json_input(input_json):
 
 
 def feed_document_to_vespa(document, document_id, vespa_url="http://localhost:4545"):
+    return
     # Constructing the document API URL
     feed_url = f"{vespa_url}/document/v1/articles/articles/docid/{document_id}"
 
@@ -249,7 +191,7 @@ async def create_article(
     directory = (
         db.query(DirectoryModel)
         .filter(
-            DirectoryModel.name == article.directory,
+            DirectoryModel.id == article.directory,
             DirectoryModel.user_uuid == article.user_uuid,
         )
         .first()
@@ -263,7 +205,7 @@ async def create_article(
         db,
         article.title,
         article.user_uuid,
-        article.directory,
+        directory.id,
         article.content,
         article.url,
     )
@@ -285,7 +227,7 @@ async def upload_article(
     directory = (
         db.query(DirectoryModel)
         .filter(
-            DirectoryModel.name == article.directory,
+            DirectoryModel.id == article.directory,
             DirectoryModel.user_uuid == article.user_uuid,
         )
         .first()
@@ -308,7 +250,7 @@ async def upload_article(
     os.remove(file_location)
     # mock summary
     article = handle_article(
-        db, article.title, article.user_uuid, article.directory, article_content
+        db, article.title, article.user_uuid, directory.id, article_content
     )
     new_json = transform_json_input(article)
     document_id = f"{article.id}"
@@ -329,33 +271,3 @@ async def delete_article(article_id: int, db=Depends(get_db)):
     db.delete(article)
     db.commit()
     return {"msg": "Article deleted successfully!"}
-
-
-@router.delete("/directory/{user_uuid}/{directory_name}")
-async def delete_directory(user_uuid: str, directory_name: str, db=Depends(get_db)):
-    if directory_name == "/":
-        return {"msg": "Cannot delete root directory!"}
-    articles = (
-        db.query(ArticleModel)
-        .filter(
-            ArticleModel.directory.startswith(directory_name),
-            ArticleModel.user_uuid == user_uuid,
-        )
-        .all()
-    )
-    for article in articles:
-        db.delete(article)
-    db.commit()
-
-    directories = (
-        db.query(DirectoryModel)
-        .filter(
-            DirectoryModel.name.startswith(directory_name),
-            DirectoryModel.user_uuid == user_uuid,
-        )
-        .all()
-    )
-    for directory in directories:
-        db.delete(directory)
-    db.commit()
-    return {"msg": "Directory deleted successfully!"}

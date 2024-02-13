@@ -48,7 +48,7 @@ def create_user(url, name, email):
     return response.json()
 
 
-def create_article(url, title, url_, user_uuid, directory, content):
+def create_article(url, title, url_, user_uuid, directory_name, content):
     # check if article exists
     articles_by_user = requests.get(f"{url}/articles/user/{user_uuid}")
     for article in articles_by_user.json():
@@ -57,29 +57,41 @@ def create_article(url, title, url_, user_uuid, directory, content):
             return article
     title = quote(title)
     url_ = quote(url_)
-    directory = quote(directory)
+    directory_name = quote(directory_name)
 
+    # get directory id
+    directory = requests.get(
+        f"{url}/directories/query?user_uuid={user_uuid}&name={directory_name}"
+    )
+    print(directory.json())
     response = requests.post(
-        f"{url}/articles/article/create?title={title}&url={url_}&user_uuid={user_uuid}&directory={directory}",
-        json={"content": content},
+        f"{url}/articles/article/create",
+        json={
+            "content": content,
+            "title": title,
+            "url": url_,
+            "user_uuid": user_uuid,
+            "directory": directory.json()["id"],
+        },
     )
     if response.status_code < 300:
         print(f"Article {title} created successfully!")
     else:
         print(f"{response.status_code} {response.reason} for article {title}")
         print(response.json())
-
+        exit(1)
     return response.json()
 
 
 def create_directory(url, name, user_uuid):
     directory = {"name": name, "user_uuid": user_uuid}
-    response = requests.post(f"{url}/articles/directory/create", json=directory)
+    response = requests.post(f"{url}/directories/create", json=directory)
     if response.status_code < 300:
         print(f"Directory {name} created successfully!")
     else:
         print(f"{response.status_code} {response.reason} for directory {name}")
-
+        print(response.json())
+        exit(1)
     return response.json()
 
 
