@@ -9,17 +9,16 @@ from app.schemas.articles import (
     ArticleContentSchema,
     DirectoryArticlesAndSubdirectoriesSchema,
     DirectoryInfoSchema,
+    DirectoryCreateSchema,
     ArticleCreateHTMLSchema,
 )
 import PyPDF2
 import random
-from transformers import AutoTokenizer, AutoModelWithLMHead
 import requests
 import json
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 import yake
 import re
-import sentencepiece
 
 router = APIRouter(prefix="/articles")
 
@@ -167,7 +166,7 @@ async def get_all_directories(user_uuid: str, db=Depends(get_db)):
 def preprocess_text(text):
     if len(text) > 1000:
         text = " ".join(text.split())
-            
+
         text = re.sub(r'[^\x00-\x7F]+', ' ', text)  # Remove non-ASCII characters
         text = re.sub(r'[\r|\n|\r\n]+', ' ', text)  # Replace newline characters with space
         text = re.sub(' +', ' ', text)  # Replace multiple spaces with a single space
@@ -196,9 +195,9 @@ def generate_summary(text, model_name="t5-small", max_length=150, min_length=40)
 
 def extract_keywords(
         text,
-        max_ngram_size = 2, 
-        deduplication_thresold = 0.9, 
-        deduplication_algo = 'seqm', 
+        max_ngram_size = 2,
+        deduplication_thresold = 0.9,
+        deduplication_algo = 'seqm',
         windowSize = 1,
         numOfKeywords = 3,
     ):
@@ -334,7 +333,7 @@ def update_vespa_document(document_id, new_directory_value, user_id, vespa_url="
             f"Feeding failed with status code {response.status_code}: {response.text}"
         )
 
-@router.post("/article/update/{article_id}/{directory_name}", response_model=DirectoryInfoSchema) 
+@router.post("/article/update/{article_id}/{directory_name}", response_model=DirectoryInfoSchema)
 async def update_directory(article_id: int, directory_name: str, db=Depends(get_db)):
     article: ArticleModel = (
         db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
@@ -409,7 +408,7 @@ def delete_article_from_vespa(document_id, user_id, vespa_url="http://localhost:
         raise Exception(
             f"Feeding failed with status code {response.status_code}: {response.text}"
         )
-    
+
 
 
 @router.delete("/article/{article_id}")
