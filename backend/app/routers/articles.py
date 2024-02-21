@@ -9,13 +9,16 @@ from app.schemas.articles import (
     ArticleContentSchema,
     DirectoryArticlesAndSubdirectoriesSchema,
     DirectoryInfoSchema,
+    DirectoryCreateSchema,
     ArticleCreateHTMLSchema,
 )
 import PyPDF2
 import random
-from transformers import AutoTokenizer, AutoModelWithLMHead
 import requests
 import json
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+import yake
+import re
 
 router = APIRouter(prefix="/articles")
 
@@ -96,6 +99,59 @@ async def get_articles_and_folders(name: str, user_uuid: str, db=Depends(get_db)
     )
 
 
+def _get_parent_directory(directory: str):
+    tree = directory.split("/")
+    if len(tree) == 1:
+        return "/"
+
+    return "/".join(tree[:-1])
+
+
+@router.post("/directory/create", response_model=DirectoryInfoSchema)
+async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db)):
+    """
+    Create a directory a/b/c/d
+    """
+    # check if directory exists
+    existing_directory: DirectoryModel = (
+        db.query(DirectoryModel)
+        .filter(
+            DirectoryModel.name == directory.name,
+            DirectoryModel.user_uuid == directory.user_uuid,
+        )
+        .first()
+    )
+    if existing_directory:
+        return existing_directory
+    if directory.name == "/":
+        directory = DirectoryModel(name=directory.name, user_uuid=directory.user_uuid)
+    else:
+        parent_dir = _get_parent_directory(directory.name)
+        parent_directory: DirectoryModel = (
+            db.query(DirectoryModel)
+            .filter(
+                DirectoryModel.name == parent_dir,
+                DirectoryModel.user_uuid == directory.user_uuid,
+            )
+            .first()
+        )
+        if parent_directory is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Parent directory not found",
+            )
+        directory = DirectoryModel(
+            name=directory.name,
+            user_uuid=directory.user_uuid,
+            parent_directory=parent_dir,
+        )
+
+    db.add(directory)
+    db.commit()
+    db.refresh(directory)
+    return directory
+
+
 @router.get("/directory/all-recursive", response_model=list[DirectoryInfoSchema])
 async def get_all_directories(user_uuid: str, db=Depends(get_db)):
     directories: list[DirectoryModel] = (
@@ -110,17 +166,77 @@ async def get_all_directories(user_uuid: str, db=Depends(get_db)):
     return directories
 
 
-def handle_article(db, title, user_uuid, directory, content, url=None):
-    tokenizer = AutoTokenizer.from_pretrained("t5-base")
-    model = AutoModelWithLMHead.from_pretrained("t5-base", return_dict=True)
-    inputs = tokenizer.encode(
-        "summarize: " + content, return_tensors="pt", max_length=512, truncation=True
+def preprocess_text(text):
+    if len(text) > 1000:
+        text = " ".join(text.split())
+
+        text = re.sub(r"[^\x00-\x7F]+", " ", text)  # Remove non-ASCII characters
+        text = re.sub(
+            r"[\r|\n|\r\n]+", " ", text
+        )  # Replace newline characters with space
+        text = re.sub(" +", " ", text)  # Replace multiple spaces with a single space
+        text = re.sub(
+            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+            "",
+            text,
+        )
+        text = re.sub(r"[^A-Za-z0-9]+", " ", text)  # Remove special characters
+
+        return text.strip()
+    else:
+        return text.strip().replace("\n", " ")
+
+
+def generate_summary(text, model_name="t5-small", max_length=150, min_length=40):
+    # Load model and tokenizer
+    tokenizer = T5Tokenizer.from_pretrained(model_name)
+    model = T5ForConditionalGeneration.from_pretrained(model_name)
+
+    # Preprocess the text
+    processed_text = preprocess_text(text)
+    t5_prepared_Text = f"summarize: {processed_text}"
+
+    # Tokenize and generate summary
+    tokenized_text = tokenizer.encode(
+        t5_prepared_Text, return_tensors="pt", max_length=150, truncation=True
     )
     summary_ids = model.generate(
-        inputs, max_length=250, length_penalty=5.0, num_beams=2
+        tokenized_text,
+        max_length=max_length,
+        min_length=min_length,
+        length_penalty=2.0,
+        num_beams=4,
+        early_stopping=True,
     )
-
     summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+    return summary
+
+
+def extract_keywords(
+    text,
+    max_ngram_size=2,
+    deduplication_thresold=0.9,
+    deduplication_algo="seqm",
+    windowSize=1,
+    numOfKeywords=3,
+):
+    custom_kw_extractor = yake.KeywordExtractor(
+        lan="en",
+        n=max_ngram_size,
+        dedupLim=deduplication_thresold,
+        dedupFunc=deduplication_algo,
+        windowsSize=windowSize,
+        top=numOfKeywords,
+        features=None,
+    )
+    keywords = custom_kw_extractor.extract_keywords(preprocess_text(text))
+    sorted_extracted = sorted(keywords, key=lambda x: x[1], reverse=True)
+    return sorted_extracted[0][0].title()
+
+
+def handle_article(db, title, user_uuid, directory, content, url=None):
+    summary = generate_summary(content)
 
     article = ArticleModel(
         title=title,
@@ -141,10 +257,10 @@ def transform_json_input(input_json):
     # Extract values from input JSON
     title = input_json.title
     directory = input_json.directory
-    uuid = input_json.user_uuid
     summary = input_json.summary
-    time_created = str(input_json.time_created)
     url = input_json.url
+    tag = extract_keywords(summary)
+    print("calculated tag: ", tag)
 
     # Construct the new JSON format
     transformed_json = {
@@ -154,18 +270,20 @@ def transform_json_input(input_json):
             "abstract": summary,  # Assuming 'summary' also goes into 'abstract'
             "url": url,  # Example URL, adjust as needed
             "directory": directory,
-            "time_created": time_created,
-            "uuid": uuid,
+            "tag": tag,
         }
     }
 
     return transformed_json
 
 
-def feed_document_to_vespa(document, document_id, vespa_url="http://localhost:4545"):
-    return
+def feed_document_to_vespa(
+    document, document_id, user_id, vespa_url="http://localhost:4545"
+):
     # Constructing the document API URL
-    feed_url = f"{vespa_url}/document/v1/articles/articles/docid/{document_id}"
+    feed_url = (
+        f"{vespa_url}/document/v1/articles/articles/group/{user_id}/{document_id}"
+    )
 
     # Headers for the request
     headers = {"Content-Type": "application/json"}
@@ -210,9 +328,66 @@ async def create_article(
         article.url,
     )
 
+    print("article inside get req", article)
+
     new_json = transform_json_input(article)
     document_id = f"{article.id}"
-    feed_document_to_vespa(new_json, document_id)
+    feed_document_to_vespa(new_json, document_id, article.user_uuid)
+    print("fed to vespa without error")
+
+    return article
+
+
+def update_vespa_document(
+    document_id, new_directory_value, user_id, vespa_url="http://localhost:4545"
+):
+    # Constructing the document API URL
+    feed_url = (
+        f"{vespa_url}/document/v1/articles/articles/group/{user_id}/{document_id}"
+    )
+
+    # Headers for the request
+    headers = {"Content-Type": "application/json"}
+
+    # Document update structure
+    document_update = {
+        "update": "id:articles:articles::{document_id}",
+        "fields": {"directory": {"assign": new_directory_value}},
+    }
+
+    # Sending the request
+    response = requests.put(feed_url, headers=headers, data=json.dumps(document_update))
+
+    # Check if the request was successful
+    if response.status_code in [200, 201]:
+        return response.json()
+    else:
+        raise Exception(
+            f"Feeding failed with status code {response.status_code}: {response.text}"
+        )
+
+
+@router.post(
+    "/article/update/{article_id}/{directory_name}", response_model=DirectoryInfoSchema
+)
+async def update_directory(article_id: int, directory_name: str, db=Depends(get_db)):
+    article: ArticleModel = (
+        db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+    )
+    if article is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Article not found"
+        )
+    article.directory = directory_name
+    db.commit()
+    db.refresh(article)
+
+    document_id = f"{article.id}"
+    update_vespa_document(
+        document_id,
+        directory_name,
+        article.user_uuid,
+    )
 
     return article
 
@@ -254,9 +429,28 @@ async def upload_article(
     )
     new_json = transform_json_input(article)
     document_id = f"{article.id}"
-    feed_document_to_vespa(new_json, document_id)
+    feed_document_to_vespa(new_json, document_id, article.user_uuid)
 
     return article
+
+
+def delete_article_from_vespa(document_id, user_id, vespa_url="http://localhost:4545"):
+    feed_url = (
+        f"{vespa_url}/document/v1/articles/articles/group/{user_id}/{document_id}"
+    )
+
+    headers = {"Content-Type": "application/json"}
+
+    # Sending the POST request to Vespa
+    response = requests.delete(feed_url, headers=headers)
+
+    if response.status_code in [200, 201]:
+        print("deleted article successfully!")
+        return response.json()
+    else:
+        raise Exception(
+            f"Feeding failed with status code {response.status_code}: {response.text}"
+        )
 
 
 @router.delete("/article/{article_id}")
@@ -270,4 +464,6 @@ async def delete_article(article_id: int, db=Depends(get_db)):
         )
     db.delete(article)
     db.commit()
+
+    delete_article_from_vespa(article.id, article.user_uuid)
     return {"msg": "Article deleted successfully!"}
