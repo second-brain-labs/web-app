@@ -20,7 +20,7 @@ api.include_router(directories.router)
 api.include_router(external.router)
 
 origins = [
-    "http://localhost:3000",
+    "*",
 ]
 
 api.add_middleware(

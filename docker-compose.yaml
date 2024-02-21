@@ -3,9 +3,11 @@ version: "3.9"
 services:
   server:
     build: ./backend
-    working_dir: /code/backend
     ports:
       - 3500:3500
-    volumes:
-      - ./backend:/code/backend
-    command: uvicorn app.main:api --host 0.0.0.0 --port 3500 --reload
+    environment:
+      - APP_ENV=dev
+  frontend:
+    build: ./frontend
+    ports:
+      - 3000:80

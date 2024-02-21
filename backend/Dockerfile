@@ -9,7 +9,7 @@ COPY poetry.lock pyproject.toml /code/backend/
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir poetry==1.6.1
 
-RUN poetry install
+RUN poetry install --all-extras
 
 COPY ./app /code/backend/app
 
