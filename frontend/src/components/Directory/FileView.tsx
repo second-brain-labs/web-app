@@ -33,6 +33,8 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
     const [create, setCreate] = useState(false);
     const [createModalOpen, setCreateModalOpen] = useState(false);
 
+    const [smartFolders, setSmartFolders] = useState<String[]>([]);
+
     const [articles, setArticles] = useState<IFile[]>([]);
     const [folders, setFolders] = useState<IFolder[]>([]);
     const [searchValue, setSearchValue] = useState('');
@@ -41,6 +43,22 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
         let re = /%../g;
         return title.replace(re, " ");
     }
+
+
+    const updateFolder = async(article_id: string, new_directory: string) => {
+        try {
+            const directory_path = (path !== null && path !== "/") ? path + "/" + new_directory : new_directory;
+            await axios.post(`http://localhost:3500/articles/article/update/`, {
+            article_id: article_id,
+            directory_name: directory_path,
+            }   
+            );
+        } catch (err) {
+            console.log(err);
+
+        }
+    }
+    
 
     const fetchArticlesFolders = async () => {
         try {
@@ -72,6 +90,7 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
         // Parameters for the query
         const params = new URLSearchParams({
             yql: transformStringToYQL(searchString),
+            'streaming.groupname': user_uuid,
             format: 'json',
         });
         try {
@@ -143,6 +162,73 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
         console.log("bro");
     }
 
+    const handleAllTags = async(tags: String[], userId: string) => {
+        await Promise.all(tags.map((tag) => 
+            axios.post(`http://localhost:3500/articles/directory/create`, {
+            name: tag,
+            user_uuid: userId,
+            }   
+            ).then(response => console.log(response))
+
+        ))
+    }
+
+
+    const handleGrouping = async () => {
+        const vespaUrl = 'http://localhost:4545';
+        // const cloudVespaUrl = "https://d31b7a33.a4e41a60.z.vespa-app.cloud"
+        const queryUrl = `${vespaUrl}/search/`;
+
+        // Parameters for the query
+        const params = new URLSearchParams({
+            yql: 'select * from articles where true limit 0 | all( group(tag) each(output(count())) )',
+            'streaming.groupname': user_uuid,
+            format: 'json',
+        });
+        try {
+            // Sending the GET request to Vespa
+            console.log("query string: ", `${queryUrl}?${params.toString()}`)
+            const response = await fetch(`${queryUrl}?${params.toString()}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            // Check if the request was successful
+            console.log("response: ", response)
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                // return jsonResponse
+                console.log(jsonResponse)
+                if (jsonResponse.root.fields.totalCount > 0) {
+                    let allTags: String[] = []
+                    let allPaths: String[] = []
+                    jsonResponse.root.children[0].children[0].children.forEach((x: any) => {
+                        console.log(x)
+                        const tag = x.value
+                        console.log("tag", tag)
+                        // Create new directory with tag name
+                        allTags.push(tag)
+                        const createPath = (path !== null && path !== "/") ? path + "/" + tag : tag;
+                        allPaths.push(createPath)
+                        console.log("allpaths:", allPaths)
+
+                    })
+                    await handleAllTags(allPaths, user_uuid)
+                    setSmartFolders(allTags);
+                    console.log("SmartFolders:", smartFolders)
+
+                } 
+
+            } else {
+                throw new Error(`Query failed with status code ${response.status}: ${await response.text()}`);
+            }
+        } catch (error) {
+            throw new Error(`Error while querying Vespa: ${error}`);
+        }
+    }
+
     const handleFolderClick = (name: string) => {
         setSearchParams({ path: name })
     }
@@ -175,6 +261,7 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
                     Add folder to this space
                 </Button>
                 <Button
+                    onClick={handleGrouping}
                     variant="contained"
                     color="success"
                     sx={{ borderRadius: "12px", marginRight: "10px", background: "#A1C88E" }}
@@ -209,7 +296,7 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
                 {folders.map((x) => <>
                     {true &&
                         <>
-                            <SmallBox onClick={() => handleFolderClick(x.name)} title={x.name} type={"folder"} />
+                            <SmallBox onClick={() => handleFolderClick(x.name)} title={x.name} type={smartFolders.includes(x.name) ? "smartfolder" : "folder"} />
                         </>
                     }
                 </>
