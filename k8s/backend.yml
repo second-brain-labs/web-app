@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: backend:v1
+        image: backend:v2
         ports:
         - containerPort: 3500
 
