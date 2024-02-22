@@ -13,9 +13,9 @@ fi
 version=$1
 
 cd frontend
-docker build -t frontend:$version ./frontend
+docker build -t frontend:$version .
 
 cd ../backend
-docker build -t backend:$version ./backend
-docker save frontend:$version | k3s ctr images import -
-docker save backend:$version | k3s ctr images import -
+docker build -t backend:$version .
+docker save frontend:$version | sudo k3s ctr images import -
+docker save backend:$version | sudo k3s ctr images import -
