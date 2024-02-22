@@ -24,5 +24,4 @@ def get_openai_response(query):
     )
 
     reply = completion.choices[0].message.content
-    print(reply)
     return reply

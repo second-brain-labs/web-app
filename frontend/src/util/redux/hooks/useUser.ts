@@ -1,8 +1,8 @@
 // useUser.ts
 
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
-import { setUser } from '../slices/userSlice';
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store";
+import { setUser } from "../slices/userSlice";
 
 export function useUser() {
   const dispatch = useDispatch();
@@ -11,20 +11,23 @@ export function useUser() {
 
   const newUserLogin = (user_uuid: string, name: string) => {
     // Perform login logic and dispatch setAuth with true
-    dispatch(setUser({
+    dispatch(
+      setUser({
         name: name,
         user_uuid: user_uuid,
-    }));
+      }),
+    );
   };
 
   const userLogout = () => {
     // Perform login logic and dispatch setAuth with true
-    dispatch(setUser({
+    dispatch(
+      setUser({
         name: null,
         user_uuid: null,
-    }));
+      }),
+    );
   };
-
 
   return {
     username,

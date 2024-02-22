@@ -1,12 +1,14 @@
 // useAuth.ts
 
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../store';
-import { setAuth } from '../slices/authSlice';
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store";
+import { setAuth } from "../slices/authSlice";
 
 export function useAuth() {
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
 
   const login = () => {
     // Perform login logic and dispatch setAuth with true

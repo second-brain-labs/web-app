@@ -17,7 +17,6 @@ async def get_user(user_uuid: str, db=Depends(get_db)):
 @router.post("/login", response_model=UserSchema)
 async def create_user_return_existing(user: UserCreateSchema, db=Depends(get_db)):
     # check if user with email exists
-    print(user)
     existing_user: UserModel = (
         db.query(UserModel).filter(UserModel.email == user.email).first()
     )

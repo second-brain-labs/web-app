@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState, useRef } from "react";
 import { Button, Stack, TextField, Typography } from "@mui/material";
-import axios from "axios";
+import { get, post } from "../../util/api";
 import { useSearchParams } from "react-router-dom";
 
 interface IFileviewProps {
@@ -15,7 +15,7 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
 
   const uploadArticle = async (fileObject: File | null) => {
     if (fileObject === null) {
-      return
+      return;
     }
     try {
       const formData = new FormData();
@@ -24,9 +24,6 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
         formData.append("user_uuid", user_uuid);
         formData.append("directory", path);
         formData.append("uploaded_file", fileObject);
-        console.log("Name: ", fileObject?.name);
-        console.log("user_id: ", user_uuid);
-        console.log("directory: ", path);
         var formDataString = "";
         formData.forEach(function (value, key) {
           formDataString += key + "=" + value + "&";
@@ -34,24 +31,16 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
 
         // Remove the trailing '&' character
         formDataString = formDataString.slice(0, -1);
-        console.log(formData);
-        console.log(fileObject);
-        console.log(formDataString);
 
         // Convert the string to a Blob
         var blob = new Blob([fileObject]);
-        const directory = axios.get(
-          `http://localhost:3500/directories/query?name=${path}&user_uuid=${user_uuid}`
+        const directory = get(
+          `directories/query?name=${path}&user_uuid=${user_uuid}`,
         );
         const directoryData = (await directory).data;
-        const response = axios.post(
-          `http://localhost:3500/articles/article/upload?title=${fileObject?.name}&user_uuid=${user_uuid}&directory=${directoryData.id}`,
-          formData
-          //   {
-          //     headers: {
-          //       "Content-Type": "multipart/form-data",
-          //     },
-          //   }
+        const response = post(
+          `articles/article/upload?title=${fileObject?.name}&user_uuid=${user_uuid}&directory=${directoryData.id}`,
+          formData,
         );
         const data = (await response).data;
         console.log(data);
@@ -65,7 +54,6 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
   const handleButtonClick = () => {
     if (fileInput && fileInput.current) {
       fileInput.current.click();
-
     }
   };
 
@@ -74,10 +62,16 @@ const PdfUpload = ({ user_uuid }: IFileviewProps) => {
       <input
         ref={fileInput}
         type="file"
-        style={{ display: 'none' }}
-        onChange={(e) => uploadArticle(e.target.files ? e.target.files[0] : null)}
+        style={{ display: "none" }}
+        onChange={(e) =>
+          uploadArticle(e.target.files ? e.target.files[0] : null)
+        }
       />
-      <Button variant="contained" onClick={handleButtonClick} sx={{ borderRadius: "12px", backgroundColor: "#ffd556" }}>
+      <Button
+        variant="contained"
+        onClick={handleButtonClick}
+        sx={{ borderRadius: "12px", backgroundColor: "#ffd556" }}
+      >
         Upload PDF
       </Button>
     </>

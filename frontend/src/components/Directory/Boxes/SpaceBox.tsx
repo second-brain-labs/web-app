@@ -1,16 +1,12 @@
-import React from 'react';
+import React from "react";
 import "./smallbox.css";
 
 interface ISmallBoxProps {
-    title: string,
-    type: "folder" | "file" | "link",
+  title: string;
+  type: "folder" | "file" | "link";
 }
 
-
-
-const SpaceBox = ({title, type}: ISmallBoxProps) => {
-    return (
-        <></>
-    );
-}
+const SpaceBox = ({ title, type }: ISmallBoxProps) => {
+  return <></>;
+};
 export default SpaceBox;

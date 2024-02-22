@@ -45,9 +45,7 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
         .first()
     )
     if existing_directory:
-        print(existing_directory)
         return existing_directory
-    print("No existing directory found")
     if directory.name == "/":
         directory_model = DirectoryModel(
             name=directory.name, user_uuid=directory.user_uuid
@@ -67,7 +65,6 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Parent directory not found",
             )
-        print(f"Parent: {parent_directory}")
         directory_model = DirectoryModel(
             name=directory.name,
             user_uuid=directory.user_uuid,
@@ -77,7 +74,6 @@ async def create_directory(directory: DirectoryCreateSchema, db=Depends(get_db))
     db.add(directory_model)
     db.commit()
     db.refresh(directory_model)
-    print(directory_model)
     return directory_model
 
 

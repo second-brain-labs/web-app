@@ -1,67 +1,62 @@
-import React from 'react';
-import { Box, Button, Typography, Container, Paper, Link } from '@mui/material';
-import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
-import { CredentialResponse } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
-import { JwtPayload } from 'jwt-decode';
-import axios from "axios";
+import React from "react";
+import { Box, Button, Typography, Container, Paper, Link } from "@mui/material";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import { CredentialResponse } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
+import { JwtPayload } from "jwt-decode";
+import { post } from "../util/api";
 import "./login.css";
-import { useAuth } from '../util/redux/hooks/useAuth';
-import { useUser } from '../util/redux/hooks/useUser';
+import { useAuth } from "../util/redux/hooks/useAuth";
+import { useUser } from "../util/redux/hooks/useUser";
 
 interface newJwtPayload extends JwtPayload {
-    name: string,
-    email: string,
+  name: string;
+  email: string;
 }
-
 
 /**
  * A page allowing users to input their email and password to login. The default
  * starting page of the application
  */
 function LoginPage() {
-    const nav = useNavigate();
-    const {login} = useAuth();
-    const {newUserLogin} = useUser();
+  const nav = useNavigate();
+  const { login } = useAuth();
+  const { newUserLogin } = useUser();
 
-    const loginUser = async(name: string, email: string) => {
-        try {
-            const response = await axios.post(`http://localhost:3500/users/login`, {
-                email: email,
-                name: name,
-            }   
-            );
-            login();
-            const data = (await response).data
-            newUserLogin(data.uuid, data.name);
-            nav("/home");
-            
-        } catch (err) {
-            console.error(err);
-        }   
+  const loginUser = async (name: string, email: string) => {
+    try {
+      const response = await post(`users/login`, {
+        email: email,
+        name: name,
+      });
+      login();
+      const data = (await response).data;
+      newUserLogin(data.uuid, data.name);
+      nav("/home");
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    const decode_jwt = (resp: CredentialResponse) => {
-        if (resp.credential === null || resp.credential === undefined) {
-            return;
-        }
-        const decoded: newJwtPayload = jwtDecode(resp.credential);
-        console.log(decoded);
-        const email = decoded.email;
-        const name = decoded.name;
-        loginUser(name, email);
+  const decode_jwt = (resp: CredentialResponse) => {
+    if (resp.credential === null || resp.credential === undefined) {
+      return;
     }
+    const decoded: newJwtPayload = jwtDecode(resp.credential);
+    const email = decoded.email;
+    const name = decoded.name;
+    loginUser(name, email);
+  };
 
-
-    return ( 
-        <Container maxWidth="lg" className="loginScreen">
+  return (
+    <Container maxWidth="lg" className="loginScreen">
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: '100vh',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          height: "100vh",
           padding: 3,
         }}
       >
@@ -72,16 +67,20 @@ function LoginPage() {
               Welcome back
             </Typography>
             <Box component="form" noValidate autoComplete="off">
-            <Paper elevation={3} style={{ padding: '2rem' }}>
+              <Paper elevation={3} style={{ padding: "2rem" }}>
                 <GoogleLogin onSuccess={decode_jwt} onError={console.log} />
-            </Paper>
-              <Typography variant="body2" className="linkSpacing" style={{ padding: '1rem' }}>
+              </Paper>
+              <Typography
+                variant="body2"
+                className="linkSpacing"
+                style={{ padding: "1rem" }}
+              >
                 <Link href="#" underline="hover">
                   Forgot your password?
                 </Link>
               </Typography>
               <Box textAlign="center" mt={2}>
-                <Typography variant="body2" sx={{ display: 'block', mb: 1 }}>
+                <Typography variant="body2" sx={{ display: "block", mb: 1 }}>
                   Using Second Brain for the first time?
                 </Typography>
                 <Button variant="outlined">Create an account</Button>
@@ -108,7 +107,7 @@ function LoginPage() {
         </Box>
       </Box>
     </Container>
-    );
+  );
 }
 
 export default LoginPage;

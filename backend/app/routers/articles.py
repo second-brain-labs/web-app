@@ -161,7 +161,6 @@ async def get_all_directories(user_uuid: str, db=Depends(get_db)):
         )
         .all()
     )
-    print(directories)
     directories.sort(key=lambda x: x.name)
     return directories
 
@@ -260,7 +259,6 @@ def transform_json_input(input_json):
     summary = input_json.summary
     url = input_json.url
     tag = extract_keywords(summary)
-    print("calculated tag: ", tag)
 
     # Construct the new JSON format
     transformed_json = {
@@ -328,12 +326,10 @@ async def create_article(
         article.url,
     )
 
-    print("article inside get req", article)
 
     new_json = transform_json_input(article)
     document_id = f"{article.id}"
     feed_document_to_vespa(new_json, document_id, article.user_uuid)
-    print("fed to vespa without error")
 
     return article
 
@@ -445,7 +441,6 @@ def delete_article_from_vespa(document_id, user_id, vespa_url="http://localhost:
     response = requests.delete(feed_url, headers=headers)
 
     if response.status_code in [200, 201]:
-        print("deleted article successfully!")
         return response.json()
     else:
         raise Exception(

@@ -1,29 +1,29 @@
-.image{
-    width: "60%";
-    height: "100%";
+.image {
+  width: "60%";
+  height: "100%";
 }
 
 .image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
-  
-  .background-image {
-    width: 100%; /* or some relative size */
-    height: auto; /* maintain aspect ratio */
-  }
-  
-  .overlay-image {
-    position: absolute;
-    max-width: 100%; /* to ensure it doesn't overflow the container */
-    max-height: 100%; /* to ensure it doesn't overflow the container */
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
 
-  .overlay-letters {
-    position: absolute;
-    font-size: 1rem; /* Adjust size as needed */
-    color: white; /* Choose a color that contrasts with the image */
-    /* Additional styling for the letters */
-  }
+.background-image {
+  width: 100%; /* or some relative size */
+  height: auto; /* maintain aspect ratio */
+}
+
+.overlay-image {
+  position: absolute;
+  max-width: 100%; /* to ensure it doesn't overflow the container */
+  max-height: 100%; /* to ensure it doesn't overflow the container */
+}
+
+.overlay-letters {
+  position: absolute;
+  font-size: 1rem; /* Adjust size as needed */
+  color: white; /* Choose a color that contrasts with the image */
+  /* Additional styling for the letters */
+}
