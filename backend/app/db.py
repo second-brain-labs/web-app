@@ -6,6 +6,8 @@ import os
 
 load_dotenv()
 
+VESPA_URL = os.getenv("VESPA_URL", "http://localhost:4545")
+
 if os.getenv("APP_ENV", "").lower() == "production":
     POSTGRES_HOST = os.getenv("POSTGRES_HOST_PROD")
     POSTGRES_PORT = os.getenv("POSTGRES_PORT_PROD")

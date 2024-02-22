@@ -7,7 +7,7 @@ import IFile from "../../util/types/file";
 import IFolder from "../../util/types/folder";
 import Popup from "./Modals/FilePopupModal";
 import SpaceBox from "./Boxes/SpaceBox";
-import { get, post } from "../../util/api";
+import { get, post, vespaUrl } from "../../util/api";
 import CreateFolderModal from "./Modals/CreateFolderModal";
 import { useSearchParams } from "react-router-dom";
 import PdfUpload from "../Shared/PdfUpload";
@@ -77,7 +77,6 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
 
   const handleSearch = async (searchString: string) => {
     // Constructing the Vespa YQL query URL
-    const vespaUrl = "http://localhost:4545";
     const queryUrl = `${vespaUrl}/search/`;
 
     // Parameters for the query
@@ -166,8 +165,6 @@ const FileView: React.FC<IFileviewProps> = ({ user_uuid, topic, setTopic }) => {
   };
 
   const handleGrouping = async () => {
-    const vespaUrl = "http://localhost:4545";
-    // const cloudVespaUrl = "https://d31b7a33.a4e41a60.z.vespa-app.cloud"
     const queryUrl = `${vespaUrl}/search/`;
 
     // Parameters for the query

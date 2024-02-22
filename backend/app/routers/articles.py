@@ -1,6 +1,6 @@
 import os
 import shutil
-from app.db import get_db
+from app.db import get_db, VESPA_URL
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models import ArticleModel, DirectoryModel
 from app.schemas.articles import (
@@ -276,7 +276,7 @@ def transform_json_input(input_json):
 
 
 def feed_document_to_vespa(
-    document, document_id, user_id, vespa_url="http://localhost:4545"
+    document, document_id, user_id, vespa_url=VESPA_URL
 ):
     # Constructing the document API URL
     feed_url = (
@@ -335,7 +335,7 @@ async def create_article(
 
 
 def update_vespa_document(
-    document_id, new_directory_value, user_id, vespa_url="http://localhost:4545"
+    document_id, new_directory_value, user_id, vespa_url=VESPA_URL
 ):
     # Constructing the document API URL
     feed_url = (
@@ -430,7 +430,7 @@ async def upload_article(
     return article
 
 
-def delete_article_from_vespa(document_id, user_id, vespa_url="http://localhost:4545"):
+def delete_article_from_vespa(document_id, user_id, vespa_url=VESPA_URL):
     feed_url = (
         f"{vespa_url}/document/v1/articles/articles/group/{user_id}/{document_id}"
     )

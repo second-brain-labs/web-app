@@ -9,6 +9,8 @@ export async function post(url: string, data: any) {
   return await axios.post(apiUrl, data);
 }
 
+export const vespaUrl = process.env.VESPA_URL || "http://localhost:4545";
+
 // Function to make a GET request with configurable hostname
 export async function get(url: string) {
   const apiUrl = `http://${HOSTNAME}:${PORT}/${url}`;
