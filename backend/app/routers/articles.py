@@ -187,27 +187,30 @@ def preprocess_text(text):
 
 def generate_summary(text, model_name="t5-small", max_length=150, min_length=40):
     # Load model and tokenizer
-    from transformers import T5Tokenizer, T5ForConditionalGeneration
-    tokenizer = T5Tokenizer.from_pretrained(model_name)
-    model = T5ForConditionalGeneration.from_pretrained(model_name)
+    try:
+        from transformers import T5Tokenizer, T5ForConditionalGeneration
+        tokenizer = T5Tokenizer.from_pretrained(model_name)
+        model = T5ForConditionalGeneration.from_pretrained(model_name)
 
-    # Preprocess the text
-    processed_text = preprocess_text(text)
-    t5_prepared_Text = f"summarize: {processed_text}"
+        # Preprocess the text
+        processed_text = preprocess_text(text)
+        t5_prepared_Text = f"summarize: {processed_text}"
 
-    # Tokenize and generate summary
-    tokenized_text = tokenizer.encode(
-        t5_prepared_Text, return_tensors="pt", max_length=150, truncation=True
-    )
-    summary_ids = model.generate(
-        tokenized_text,
-        max_length=max_length,
-        min_length=min_length,
-        length_penalty=2.0,
-        num_beams=4,
-        early_stopping=True,
-    )
-    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        # Tokenize and generate summary
+        tokenized_text = tokenizer.encode(
+            t5_prepared_Text, return_tensors="pt", max_length=150, truncation=True
+        )
+        summary_ids = model.generate(
+            tokenized_text,
+            max_length=max_length,
+            min_length=min_length,
+            length_penalty=2.0,
+            num_beams=4,
+            early_stopping=True,
+        )
+        summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+    except Exception as e:
+        print(e)
 
     return summary
 

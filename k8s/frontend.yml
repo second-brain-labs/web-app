@@ -17,11 +17,6 @@ spec:
           image: frontend:v2
           ports:
             - containerPort: 80
-          env:
-            - name: HOSTNAME
-              value: backend-service
-            - name: VESPA_URL
-              value: "http://vespa:8080"
 ---
 apiVersion: v1
 kind: Service
