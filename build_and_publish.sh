@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # This shell script builds docker images and drops them into the k3s container
-# TODO: automatically update k8s manifest image versions
-#
+# Current version: v2
+
 set -euxo pipefail
 
 if [ -z "$1" ]; then
@@ -17,5 +17,7 @@ docker build -t frontend:$version .
 
 cd ../backend
 docker build -t backend:$version .
+
+sudo k3s ctr images prune --all
 docker save frontend:$version | sudo k3s ctr images import -
 docker save backend:$version | sudo k3s ctr images import -

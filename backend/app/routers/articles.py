@@ -16,7 +16,6 @@ import PyPDF2
 import random
 import requests
 import json
-from transformers import T5Tokenizer, T5ForConditionalGeneration
 import yake
 import re
 
@@ -188,6 +187,7 @@ def preprocess_text(text):
 
 def generate_summary(text, model_name="t5-small", max_length=150, min_length=40):
     # Load model and tokenizer
+    from transformers import T5Tokenizer, T5ForConditionalGeneration
     tokenizer = T5Tokenizer.from_pretrained(model_name)
     model = T5ForConditionalGeneration.from_pretrained(model_name)
 
