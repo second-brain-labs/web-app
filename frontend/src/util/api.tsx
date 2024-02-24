@@ -1,15 +1,17 @@
 import axios, { AxiosResponse } from "axios";
 
-const HOSTNAME = process.env.HOSTNAME || "localhost";
+const HOSTNAME = process.env.HOSTNAME
+  ? `https://${process.env.HOSTNAME}/api`
+  : "http://localhost:3500";
 
 export async function post(url: string, data: any) {
-  const apiUrl = `https://${HOSTNAME}/api/${url}`;
+  const apiUrl = `${HOSTNAME}/${url}`;
   return await axios.post(apiUrl, data);
 }
 
 export const vespaUrl = process.env.VESPA_URL || "http://localhost:4545";
 
 export async function get(url: string) {
-  const apiUrl = `https://${HOSTNAME}:/api/${url}`;
+  const apiUrl = `${HOSTNAME}/${url}`;
   return await axios.get(apiUrl);
 }
