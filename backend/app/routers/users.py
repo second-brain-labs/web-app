@@ -29,7 +29,6 @@ async def create_user_return_existing(user: UserCreateSchema, db=Depends(get_db)
     directory: DirectoryModel = DirectoryModel(name="/", user_uuid=user.uuid)
     db.add(directory)
     db.commit()
-
     return user
 
 

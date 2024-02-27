@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Button, Typography, Container, Paper, Link } from "@mui/material";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -22,7 +22,13 @@ interface newJwtPayload extends JwtPayload {
 function LoginPage() {
   const nav = useNavigate();
   const { login } = useAuth();
-  const { newUserLogin } = useUser();
+  const { username, userID, newUserLogin } = useUser();
+
+  useEffect(() => {
+    if (username !== null && userID !== null) {
+      nav("/home");
+    }
+  }, []);
 
   const loginUser = async (name: string, email: string) => {
     try {
