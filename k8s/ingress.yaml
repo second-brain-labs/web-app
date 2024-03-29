@@ -1,0 +1,77 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-frontend
+  annotations:
+    spec.ingressClassName: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd
+spec:
+  rules:
+    - host: secondbrainlabs.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80
+  tls:
+    - secretName: secondbrain-tls
+      hosts:
+        - secondbrainlabs.xyz
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-backend
+  annotations:
+    spec.ingressClassName: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd, default-ingress-stripprefix@kubernetescrd
+spec:
+  rules:
+    - host: secondbrainlabs.xyz
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 80
+  tls:
+    - secretName: secondbrain-tls
+      hosts:
+        - secondbrainlabs.xyz
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-vespa
+  annotations:
+    spec.ingressClassName: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd, default-ingress-stripprefix-vespa@kubernetescrd, default-cors-header@kubernetescrd
+spec:
+  rules:
+    - host: secondbrainlabs.xyz
+      http:
+        paths:
+          - path: /vespa
+            pathType: Prefix
+            backend:
+              service:
+                name: vespa
+                port:
+                  number: 8080
+  tls:
+    - secretName: secondbrain-tls
+      hosts:
+        - secondbrainlabs.xyz

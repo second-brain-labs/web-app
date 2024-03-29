@@ -1,0 +1,61 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit
+        run: pre-commit run --all-files
+
+  build-and-deploy:
+    needs: pre-commit
+    runs-on: ubuntu-latest
+    if: ${{ github.ref }} == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Determine changes in frontend and backend
+        id: detect_changes
+        run: |
+          changes_frontend=$(git diff --name-only HEAD^ HEAD frontend .github/workflows/ci.yml build_and_publish.sh)
+          changes_backend=$(git diff --name-only HEAD^ HEAD backend .github/workflows/ci.yml build_and_publish.sh)
+          if [[ -n "$changes_frontend" ]]; then
+            echo "frontend_changed=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ -n "$changes_backend" ]]; then
+            echo "backend_changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: SSH into EC2 instance and run script
+        if: steps.detect_changes.outputs.frontend_changed == 'true' || steps.detect_changes.outputs.backend_changed == 'true'
+        uses: appleboy/ssh-action@master
+        env:
+          CHANGES_FRONTEND: ${{ steps.detect_changes.outputs.frontend_changed }}
+          CHANGES_BACKEND: ${{ steps.detect_changes.outputs.backend_changed }}
+        with:
+          host: ec2-3-95-59-164.compute-1.amazonaws.com
+          username: ubuntu
+          key: ${{ secrets.AWS_PRIVATEKEY_SENIORDESIGN }}
+          script: ~/web-app/build_and_publish.sh ${{ github.sha }}
+          envs: CHANGES_FRONTEND,CHANGES_BACKEND

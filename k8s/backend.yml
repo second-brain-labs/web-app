@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: backend:version
+          ports:
+            - containerPort: 3500
+          env:
+            - name: MODAL_TOKEN_ID
+              valueFrom:
+                secretKeyRef:
+                  name: modal
+                  key: MODAL_TOKEN_ID
+            - name: MODAL_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: modal
+                  key: MODAL_TOKEN_SECRET
+            - name: VESPA_URL
+              value: https://secondbrainlabs.xyz/vespa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3500
+  type: NodePort

@@ -1,0 +1,46 @@
+{
+  "articles": [
+    {
+      "title": "Creating a Chrome extension with React and TypeScript",
+      "url": "https://medium.com/@gilfink/creating-a-chrome-extension-with-react-typescript-401e7a457947",
+      "directory": "/",
+      "id": "1"
+    },
+    {
+      "title": "Dijkstra's algorithm",
+      "url": "https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm",
+      "directory": "cs",
+      "id": "2"
+    },
+    {
+      "title": "Rescue Dog With Adorable Habit to Fall Asleep Wins Pet of the Week",
+      "url": "https://www.msn.com/en-us/lifestyle/pets-animals/rescue-dog-with-adorable-habit-to-fall-asleep-wins-pet-of-the-week/ar-BB1b9Z5o",
+      "directory": "dogs",
+      "id": "3"
+    },
+    {
+      "title": "Golden Retriever Dog Breed Facts & Information",
+      "url": "https://www.dog-learn.com/dog-breeds/golden-retriever/",
+      "directory": "dogs/golden-retrievers",
+      "id": "4"
+    },
+    {
+      "title": "Golden Years",
+      "url": "https://slate.com/technology/2023/10/golden-retriever-lifespan-dying-younger-dog-health.html",
+      "directory": "dogs/golden-retrievers",
+      "id": "5"
+    },
+    {
+      "title": "TARJAN’S ALGORITHM FOR STRONGLY CONNECTED COMPONENTS",
+      "url": "https://www.topcoder.com/thrive/articles/tarjans-algorithm-for-strongly-connected-components",
+      "directory": "cs",
+      "id": "6"
+    },
+    {
+      "title": "Can you explain Bleichenbacher's CCA attack on PKCS#1 v1.5?",
+      "url": "https://crypto.stackexchange.com/questions/12688/can-you-explain-bleichenbachers-cca-attack-on-pkcs1-v1-5",
+      "directory": "cs",
+      "id": "7"
+    }
+  ]
+}
